@@ -1,124 +1,78 @@
-/* Klondike Solitaire — Arline Arcade.
-   Crisp DOM/CSS cards (no images), tuned big & legible for phone + elderly eyes.
-   Consumes the arcade theme vars from ../../styles/app.css. */
+/* Klondike Solitaire — Arline Arcade. CSS-drawn cards on the gold-and-felt
+   theme from app.css. Cards are absolutely positioned; moving = changing a
+   transform, so the CSS transition slides them. */
 
-:root{
-  --felt:#1b5e4a;          /* table green */
-  --felt-2:#14483a;
-  --card-w:clamp(58px, 12.4vw, 96px);
-  --card-h:calc(var(--card-w) * 1.4);
-  --gap:clamp(8px, 2.2vw, 18px);
-  --fan-down:calc(var(--card-h) * 0.18);   /* vertical offset for face-down */
-  --fan-up:calc(var(--card-h) * 0.30);     /* vertical offset for face-up   */
-  --red:#d23b30;
-  --black:#1d1f26;
+.sol-bar{
+  display:flex; align-items:center; justify-content:center; gap:.6rem; flex-wrap:wrap;
+  width:100%; max-width:900px; margin:0 auto; padding:6px clamp(8px,3vw,18px) 2px;
 }
-
-html,body{height:100%}
-body{ overflow:hidden; }
-#felt{ position:fixed; inset:0; width:100%; height:100%; z-index:-2; display:block; }
-/* CSS fallback felt (shows when WebGPU is off; WebGPU canvas paints over it) */
-body::before{
-  content:""; position:fixed; inset:0; z-index:-3;
-  background:
-    radial-gradient(120% 90% at 50% 0%, rgba(47,125,102,.35), transparent 60%),
-    radial-gradient(140% 120% at 50% 120%, rgba(0,0,0,.5), transparent 60%),
-    linear-gradient(160deg, var(--felt), var(--felt-2));
-}
-
-/* ---- top bar ---- */
-.bar{
-  position:sticky; top:0; z-index:10;
-  display:flex; align-items:center; gap:.6rem; flex-wrap:wrap;
-  padding:clamp(8px,2vw,14px) clamp(10px,3vw,22px);
-  background:linear-gradient(rgba(10,10,13,.78), rgba(10,10,13,.35));
-  backdrop-filter:blur(8px); border-bottom:1px solid var(--line);
-}
-.bar .spacer{flex:1}
-.bar .title{font-family:var(--display); font-weight:700; font-size:clamp(1.1rem,4vw,1.5rem)}
-.bar .stat{font-family:var(--mono); font-size:.78rem; color:var(--muted); white-space:nowrap}
 .btn{
-  font-family:var(--mono); font-size:.84rem; color:var(--paper);
-  background:rgba(255,255,255,.06); border:1px solid var(--line);
-  border-radius:999px; padding:.5rem .9rem; cursor:pointer; user-select:none;
-  display:inline-flex; align-items:center; gap:.4rem; min-height:42px;
-  transition:background .15s, border-color .15s, transform .1s;
+  font:700 .82rem/1 var(--mono); color:var(--ink); background:var(--gold-grad);
+  border:none; border-radius:999px; padding:.6rem 1.2rem; cursor:pointer;
+  box-shadow:0 3px 10px rgba(0,0,0,.4); transition:transform .12s ease, box-shadow .12s ease;
 }
-.btn:hover{background:rgba(194,168,120,.14); border-color:rgba(194,168,120,.5)}
-.btn:active{transform:translateY(1px)}
-.btn.primary{background:var(--accent); color:#1a1206; border-color:transparent; font-weight:700}
-.btn[disabled]{opacity:.4; pointer-events:none}
+.btn:hover{ transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,.45), 0 0 18px rgba(233,195,74,.4) }
+.btn.ghost{ background:rgba(0,0,0,.25); color:var(--gold-hi); box-shadow:inset 0 0 0 1px var(--line) }
+.moves{ font-family:var(--mono); font-size:.78rem; color:var(--paper); opacity:.85; margin-left:.3rem }
 
 /* ---- board ---- */
-.board{
-  position:relative; width:100%;
-  max-width:980px; margin:0 auto; padding:clamp(10px,3vw,22px);
-  height:calc(100dvh - 64px);
-  touch-action:none;   /* we handle drags ourselves */
-}
+.board{ position:relative; width:100%; max-width:900px; margin:0 auto; min-height:62vh }
 .slot{
-  position:absolute; width:var(--card-w); height:var(--card-h);
-  border-radius:calc(var(--card-w) * .1);
-  border:2px dashed rgba(255,255,255,.16);
-  box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);
+  position:absolute; left:0; top:0; width:var(--cw,64px); height:calc(var(--cw,64px) * 1.4);
+  border-radius:calc(var(--cw,64px) * .1); border:2px dashed rgba(233,195,74,.26);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.18);
 }
-.slot.stock{ cursor:pointer; display:grid; place-items:center; }
-.slot.stock::after{ content:"↻"; font-size:calc(var(--card-w)*.5); color:rgba(255,255,255,.28) }
-.slot.foundation::after{ content:attr(data-suit); font-size:calc(var(--card-w)*.5); color:rgba(255,255,255,.16) }
+.slot.stock{ cursor:pointer }
+.slot.stock::after{ content:"↻"; position:absolute; inset:0; display:grid; place-items:center; font-size:calc(var(--cw,64px)*.5); color:rgba(233,195,74,.42) }
+.slot.foundation::after{ content:attr(data-suit); position:absolute; inset:0; display:grid; place-items:center; font-size:calc(var(--cw,64px)*.55); color:rgba(233,195,74,.22) }
 
 /* ---- cards ---- */
 .card{
-  position:absolute; left:0; top:0;
-  width:var(--card-w); height:var(--card-h);
-  border-radius:calc(var(--card-w) * .1);
-  background:#f6f3ec; color:var(--black);
-  box-shadow:0 1px 2px rgba(0,0,0,.35), 0 6px 14px rgba(0,0,0,.25);
-  transition:transform .19s cubic-bezier(.2,.7,.3,1);
-  will-change:transform; user-select:none; -webkit-user-select:none;
-  font-family:var(--display);
-  overflow:hidden;
+  position:absolute; left:0; top:0; width:var(--cw,64px); height:calc(var(--cw,64px) * 1.4);
+  border-radius:calc(var(--cw,64px) * .1); overflow:hidden; cursor:pointer;
+  background:linear-gradient(165deg,#fffdf8,#efe9da); color:#1d1f26;
+  border:1px solid rgba(0,0,0,.14);
+  box-shadow:0 1px 2px rgba(0,0,0,.35), 0 5px 12px rgba(0,0,0,.26);
+  transition:transform .26s cubic-bezier(.2,.7,.3,1), box-shadow .2s ease;
+  will-change:transform; user-select:none; -webkit-user-select:none; font-family:var(--display);
 }
+.board.no-anim .card{ transition:none }
 .card.red{ color:var(--red) }
-.card.dragging{ transition:none; box-shadow:0 10px 24px rgba(0,0,0,.5); cursor:grabbing; z-index:9999 }
-.card.up{ cursor:grab }
-.card .corner{
-  position:absolute; left:6%; top:3%; line-height:.95; text-align:center;
-  font-weight:700;
-}
-.card .corner .r{ font-size:calc(var(--card-w) * .34) }
-.card .corner .s{ font-size:calc(var(--card-w) * .26); display:block }
-.card .corner.br{ left:auto; top:auto; right:6%; bottom:3%; transform:rotate(180deg) }
-.card .pip{
-  position:absolute; inset:0; display:grid; place-items:center;
-  font-size:calc(var(--card-w) * .62); opacity:.92;
-}
-.card.face-court .pip{ font-size:calc(var(--card-w) * .5) }
 .card.down{
-  background:
-    repeating-linear-gradient(45deg, rgba(194,168,120,.22) 0 6px, transparent 6px 12px),
-    linear-gradient(160deg, #2b3a52, #16203a);
-  border:1px solid rgba(194,168,120,.35);
+  background:linear-gradient(155deg,#1a2c49,#0b1830); border:1px solid rgba(233,195,74,.4);
+  box-shadow:0 1px 2px rgba(0,0,0,.4), 0 5px 12px rgba(0,0,0,.3);
 }
 .card.down::after{
-  content:"♠"; position:absolute; inset:0; display:grid; place-items:center;
-  font-size:calc(var(--card-w)*.5); color:rgba(194,168,120,.5);
+  content:""; position:absolute; inset:0;
+  background:
+    repeating-linear-gradient(45deg, rgba(233,195,74,.16) 0 5px, transparent 5px 11px),
+    radial-gradient(circle at 50% 50%, rgba(233,195,74,.28), transparent 62%);
 }
-.card.hint{ outline:3px solid var(--accent); outline-offset:-3px }
+.card .corner{ position:absolute; left:7%; top:3.5%; display:flex; flex-direction:column; align-items:center; line-height:.92; font-weight:800 }
+.card .corner b{ font-size:calc(var(--cw,64px)*.34) }
+.card .corner i{ font-size:calc(var(--cw,64px)*.26); font-style:normal; margin-top:1px }
+.card .corner.br{ left:auto; top:auto; right:7%; bottom:3.5%; transform:rotate(180deg) }
+.card .pip{ position:absolute; inset:0; display:grid; place-items:center; font-size:calc(var(--cw,64px)*.62); opacity:.92 }
+.card.shake{ animation:solBad .32s }
+@keyframes solBad{ 0%,100%{ box-shadow:0 1px 2px rgba(0,0,0,.35), 0 5px 12px rgba(0,0,0,.26) } 45%{ box-shadow:0 0 0 3px var(--red), 0 6px 14px rgba(0,0,0,.4) } }
 
-/* ---- win overlay ---- */
+/* ---- win ---- */
 .win{
-  position:fixed; inset:0; z-index:50; display:none; place-items:center;
-  background:radial-gradient(circle at 50% 40%, rgba(10,10,13,.4), rgba(10,10,13,.85));
-  backdrop-filter:blur(3px);
+  position:fixed; inset:0; z-index:1100; display:none; place-items:center;
+  background:radial-gradient(circle at 50% 38%, rgba(6,42,26,.5), rgba(3,12,7,.86));
+  -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px);
 }
-.win.show{ display:grid; animation:fade .4s ease }
-.win .panel{ text-align:center; padding:2rem 2.5rem }
-.win .panel .big{ font-size:clamp(3rem,16vw,6rem) }
-.win .panel h1{ font-family:var(--display); font-weight:700; font-size:clamp(2rem,8vw,3.2rem); margin:.3rem 0 .2rem; color:var(--accent) }
-.win .panel p{ color:var(--muted); margin:0 0 1.4rem }
-@keyframes fade{ from{opacity:0} to{opacity:1} }
+.win.show{ display:grid; animation:winFade .4s ease }
+.win .panel{
+  text-align:center; padding:clamp(22px,5vw,38px) clamp(28px,6vw,52px);
+  background:linear-gradient(180deg,rgba(12,70,42,.96),rgba(6,42,26,.98)); border-radius:20px;
+  box-shadow:0 0 0 3px var(--gold-2), inset 0 0 0 2px rgba(255,240,176,.25), 0 22px 54px rgba(0,0,0,.6);
+}
+.win .panel .big{ font-size:clamp(3rem,16vw,5.5rem) }
+.win .panel h1{ font-family:var(--display); font-weight:700; font-size:clamp(2rem,8vw,3rem); margin:.2rem 0; background:var(--gold-grad); -webkit-background-clip:text; background-clip:text; color:transparent }
+.win .panel p{ color:var(--paper); margin:.2rem 0 1.3rem }
+@keyframes winFade{ from{opacity:0} to{opacity:1} }
+.confetti{ position:fixed; top:-20px; width:10px; height:14px; border-radius:2px; z-index:1099; pointer-events:none }
+@keyframes drop{ to{ transform:translateY(112vh) rotate(720deg); opacity:.25 } }
 
-.confetti{ position:fixed; width:10px; height:14px; z-index:49; top:-20px; border-radius:2px; pointer-events:none }
-@keyframes drop{ to{ transform:translateY(110vh) rotate(720deg); opacity:.2 } }
-
-@media (prefers-reduced-motion:reduce){ .card{transition:none} }
+@media (prefers-reduced-motion:reduce){ .card{ transition:none } }

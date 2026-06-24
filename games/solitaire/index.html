@@ -2,11 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Solitaire — Arline Arcade</title>
+<meta name="description" content="Klondike Solitaire — tap to play, smooth and ad-free.">
 <meta name="theme-color" content="#0b6b40">
 <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../../styles/app.css">
+<link rel="stylesheet" href="solitaire.css">
 </head>
 <body>
 <nav class="topbar">
@@ -15,11 +17,26 @@
   <span class="crumb">Solitaire</span>
 </nav>
 
-<div class="stub">
-  <div class="big">&#9824;</div>
-  <h1>Solitaire</h1>
-  <p>Klondike is being dealt. Drag-and-drop play, smart auto-complete, and an endless shuffle are on the way.</p>
-  <span class="soon-pill">Coming soon</span>
+<div class="sol-bar">
+  <button id="newGame" class="btn">New game</button>
+  <button id="autoBtn" class="btn ghost">Auto-finish</button>
+  <span class="moves" id="moves">0 moves</span>
 </div>
+
+<div id="board" class="board"></div>
+
+<div id="win" class="win">
+  <div class="panel">
+    <div class="big">&#127942;</div>
+    <h1>You win!</h1>
+    <p>Cleared in <span id="winMoves">0</span> moves</p>
+    <button id="winNew" class="btn">New game</button>
+  </div>
+</div>
+
+<button id="musicToggle" class="music-toggle" type="button" aria-label="Toggle music">&#9834;</button>
+
+<script type="module" src="../../assets/js/music.js"></script>
+<script type="module" src="solitaire.js"></script>
 </body>
 </html>
