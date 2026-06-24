@@ -13,7 +13,7 @@ const NP = 4;
 const el = document.getElementById('uno');
 
 let deck=[], discard=[], hands=[[],[],[],[]];
-let current=0, dir=1, color=null, over=false, drew=false, busy=false, winner=-1;
+let current=0, dir=1, color=null, over=false, drew=false, busy=false, winner=-1, anim=null;
 let picker=null;   // pending wild-color callback
 
 const top = ()=> discard[discard.length-1];
@@ -60,11 +60,12 @@ function aiColor(p){
 }
 
 /* ---- a play -------------------------------------------------------------- */
-function doPlay(p, idx){
+function doPlay(p, idx, from){
   const card = hands[p].splice(idx,1)[0];
   discard.push(card);
   color = (card.color==='wild') ? (card.chosen || aiColor(p)) : card.color;
   (card.type==='draw2'||card.type==='wild4') ? sfx.foundation() : sfx.place();
+  if(from) anim={from, target:'discard'};
 
   if(hands[p].length===0){ winner=p; over=true; busy=false; if(p===0) sfx.win(); render(); return; }
 
@@ -100,7 +101,7 @@ function aiTurn(){
   if(opts.length){
     const pick=opts[0];
     if(pick.c.color==='wild') pick.c.chosen=aiColor(p);
-    doPlay(p, pick.i);
+    doPlay(p, pick.i, rectOf(`.opp[data-p="${p}"] .stack`));
   } else {
     const dr=draw(1); if(dr.length) hands[p].push(dr[0]);
     sfx.deal(); render();
@@ -109,7 +110,7 @@ function aiTurn(){
       const card=dr[0];
       if(card && legal(card)){
         if(card.color==='wild') card.chosen=aiColor(p);
-        doPlay(p, hands[p].indexOf(card));
+        doPlay(p, hands[p].indexOf(card), rectOf(`.opp[data-p="${p}"] .stack`));
       } else { current=step(p,1); drew=false; render(); scheduleTurn(); }
     }, 650);
   }
@@ -120,13 +121,17 @@ function humanPlay(idx){
   if(over || current!==0 || busy || picker) return;
   const card=hands[0][idx]; if(!card) return;
   if(!legal(card)){ sfx.invalid(); shake(idx); return; }
-  if(card.color==='wild') pickColor(col=>{ card.chosen=col; doPlay(0,idx); });
-  else doPlay(0, idx);
+  const from=rectOf(`.card-btn[data-idx="${idx}"]`);
+  if(card.color==='wild') pickColor(col=>{ card.chosen=col; doPlay(0,idx,from); });
+  else doPlay(0, idx, from);
 }
 function humanDraw(){
   if(over || current!==0 || busy || drew || picker) return;
+  const from=rectOf('#drawPile');
   const dr=draw(1); if(dr.length) hands[0].push(dr[0]);
-  drew=true; sfx.deal(); render();
+  drew=true; sfx.deal();
+  anim={from, target:'handLast'};
+  render();
   const card=dr[0];
   if(!(card && legal(card))){            // nothing playable -> auto-pass
     setTimeout(()=>{ if(current===0 && !over){ current=step(0,1); drew=false; render(); scheduleTurn(); } }, 700);
@@ -155,7 +160,7 @@ function cardBack(){ return `<div class="uno-card back"><span class="pip">UNO</s
 function render(){
   if(!el) return;
   const opps = [1,2,3].map(p=>`
-    <div class="opp ${current===p&&!over?'active':''}">
+    <div class="opp ${current===p&&!over?'active':''}" data-p="${p}">
       <div class="stack">${cardBack()}<span class="count">${hands[p].length}</span></div>
       <div class="oname">${NAMES[p]}</div>
     </div>`).join('');
@@ -184,8 +189,28 @@ function render(){
   bind('#drawBtn','click',humanDraw); bind('#drawPile','click',humanDraw); bind('#passBtn','click',humanPass);
   if(over) bind('#again','click', ()=>{ deal(); render(); });
   if(picker) el.querySelectorAll('.pick').forEach(b=> b.addEventListener('click', ()=>{ const cb=picker; picker=null; cb(b.dataset.col); }));
+
+  if(anim){
+    const sel = anim.target==='discard' ? '.pile.discard .uno-card' : '.hand .card-btn:last-child .uno-card';
+    slideIn(el.querySelector(sel), anim.from);
+    anim=null;
+  }
 }
 function bind(sel,ev,fn){ const n=el.querySelector(sel); if(n) n.addEventListener(ev,fn); }
+function rectOf(sel){ const n=el.querySelector(sel); return n ? n.getBoundingClientRect() : null; }
+function slideIn(node, from){
+  if(!node || !from) return;
+  const r=node.getBoundingClientRect();
+  const dx=from.left-r.left, dy=from.top-r.top;
+  const sc=(from.width && r.width) ? from.width/r.width : 1;
+  node.style.transition='none';
+  node.style.transform=`translate(${dx}px,${dy}px) scale(${sc})`;
+  node.getBoundingClientRect();                    // force reflow before animating
+  requestAnimationFrame(()=>{
+    node.style.transition='transform .3s cubic-bezier(.2,.7,.3,1)';
+    node.style.transform='none';
+  });
+}
 function pickerOverlay(){
   return `<div class="overlay"><div class="panel"><h3>Pick a color</h3><div class="picks">
     ${COLORS.map(c=>`<button class="pick sc-${c}" data-col="${c}" aria-label="${c}"></button>`).join('')}</div></div></div>`;
