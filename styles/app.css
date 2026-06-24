@@ -42,9 +42,9 @@
 @view-transition{ navigation:auto }
 
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%; overscroll-behavior:none}
 body{
-  margin:0; min-height:100dvh; color:var(--paper);
+  margin:0; min-height:100dvh; color:var(--paper); overscroll-behavior:none;
   font-family:var(--body); line-height:1.5; font-size:clamp(16px,1rem + .25vw,18px);
   background:
     radial-gradient(120% 85% at 50% 6%, var(--felt) 0%, var(--felt-2) 46%, var(--felt-edge) 100%) fixed;

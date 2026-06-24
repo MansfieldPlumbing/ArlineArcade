@@ -10,7 +10,7 @@
 import sfx from './sfx.js';
 
 const LS = 'arline-music';
-let enabled = localStorage.getItem(LS) !== '0';        // default on
+let enabled = localStorage.getItem(LS) === '1';        // default OFF (looping bg music was too aggressive)
 let ctx = null, master = null, timer = null, playing = false;
 let nextBar = 0, bar = 0, pianoWave = null;
 
@@ -108,5 +108,6 @@ function toggle(btn){
 const btn = document.getElementById('musicToggle');
 if(btn){ updateBtn(btn); btn.addEventListener('click', (e)=>{ e.stopPropagation(); toggle(btn); }); }
 window.addEventListener('pointerdown', ()=>{ if(enabled) start(); }, { once:true });
+document.addEventListener('visibilitychange', ()=>{ if(document.hidden) stop(); else if(enabled) start(); });  // never in the background
 
 export default { start, stop, toggle:()=>toggle(btn), isOn:()=>enabled };
