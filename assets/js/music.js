@@ -19,17 +19,18 @@ const beat = 60 / BPM;
 const barDur = beat * BEATS;
 const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
 
-/* 8-bar casino-lounge loop: Cmaj7 · A7 · Dm7 · G7 · Em7 · A7 · Dm7 · G7 */
-const PROG = [
-  { bass:48, notes:[60,64,67,71] },  // Cmaj7  C E G B
-  { bass:45, notes:[61,64,67,69] },  // A7     C# E G A
-  { bass:50, notes:[62,65,69,72] },  // Dm7    D F A C
-  { bass:43, notes:[59,62,65,67] },  // G7     B D F G
-  { bass:52, notes:[59,62,64,67] },  // Em7    B D E G
-  { bass:45, notes:[61,64,67,69] },  // A7
-  { bass:50, notes:[62,65,69,72] },  // Dm7
-  { bass:43, notes:[59,62,65,67] },  // G7
-];
+/* chord voicings — [bass MIDI, [upper voices]] */
+const V = {
+  Cmaj7:[48,[60,64,67,71]], A7:[45,[61,64,67,69]], Dm7:[50,[62,65,69,72]],
+  G7:[43,[59,62,65,67]],    Em7:[52,[59,62,64,67]], Fmaj7:[53,[60,64,65,69]],
+  Am7:[45,[60,64,67,69]],   D7:[50,[60,62,66,69]],
+};
+/* A 24-bar JRPG-lounge song in three 8-bar sections, looped: bright → lift → wistful */
+const SONG = [
+  'Cmaj7','A7','Dm7','G7','Em7','A7','Dm7','G7',
+  'Fmaj7','Em7','Dm7','G7','Cmaj7','Am7','Dm7','G7',
+  'Am7','Em7','Fmaj7','G7','Am7','D7','Fmaj7','G7',
+].map(n => ({ bass:V[n][0], notes:V[n][1] }));
 
 function ensure(){
   ctx = sfx.context(); if(!ctx) return false;
@@ -57,7 +58,7 @@ function voice(freq, start, dur, gain){
   o.start(start); o.stop(start + dur + 0.05);
 }
 function scheduleBar(i, t){
-  const ch = PROG[i % PROG.length];
+  const ch = SONG[i % SONG.length];
   const hum = ()=> (Math.random()-0.5)*0.008;                    // tiny timing humanize
   voice(mtof(ch.bass),   t + hum(),          beat*2.4, 0.11);            // left hand: root on 1
   voice(mtof(ch.bass+7), t + beat*2 + hum(), beat*1.8, 0.085);          //            fifth on 3
