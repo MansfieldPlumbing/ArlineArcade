@@ -18,8 +18,24 @@ function ac(){
   return ctx;
 }
 
-/** Call from a user gesture (pointerdown) so iOS/Android will let audio play. */
-export function unlock(){ const c = ac(); if(c && c.state === 'suspended') c.resume(); }
+/** Robustly unlock audio. iOS won't start a context from resume() alone — it
+    needs a (silent) buffer played *inside* a real user gesture. We also attach
+    global one-time gesture listeners so the very first tap anywhere unlocks. */
+let _unlocked = false;
+function primeUnlock(){
+  const c = ac(); if(!c) return;
+  if(c.state === 'suspended') c.resume();
+  if(_unlocked) return;
+  try{
+    const b = c.createBuffer(1, 1, 22050);
+    const s = c.createBufferSource(); s.buffer = b; s.connect(c.destination); s.start(0);
+    _unlocked = true;
+  }catch(_){}
+}
+export function unlock(){ primeUnlock(); }
+const _UNLOCK_EVENTS = ['pointerdown','touchend','mousedown','keydown'];
+function _onGesture(){ primeUnlock(); if(_unlocked) _UNLOCK_EVENTS.forEach(ev=>removeEventListener(ev,_onGesture)); }
+if(typeof window !== 'undefined') _UNLOCK_EVENTS.forEach(ev=>addEventListener(ev,_onGesture,{passive:true}));
 export function context(){ return ac(); }   // shared AudioContext (used by music.js)
 export function toggleMute(){ muted = !muted; return muted; }
 export function isMuted(){ return muted; }
