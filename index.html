@@ -11,6 +11,13 @@
 <link rel="stylesheet" href="styles/app.css">
 </head>
 <body>
+
+<div id="intro" aria-hidden="true">
+  <canvas id="introgl"></canvas>
+  <img id="introLogo" src="assets/arlinearcade-logo.png" alt="Arline Arcade" decoding="async">
+  <button id="introSkip" type="button">Tap to enter &rsaquo;</button>
+</div>
+
 <main class="wrap">
 
   <header class="site-header">
@@ -63,5 +70,7 @@
   </footer>
 
 </main>
+
+<script type="module" src="assets/js/intro.js"></script>
 </body>
 </html>
