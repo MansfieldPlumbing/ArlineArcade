@@ -59,8 +59,28 @@ function noise({t0=0, dur=0.1, gain=0.1, filter='bandpass', f0=1800, f1, q=0.8})
   src.start(now); src.stop(now + dur + 0.02);
 }
 
+/** A soft "shhh" — filtered-noise swoosh with a smooth attack so it slides instead of clicking. */
+function shh({t0=0, dur=0.22, gain=0.05, f0=900, f1=4200}){
+  const c = ac(); if(!c || muted) return;
+  const now = c.currentTime + t0;
+  const n = Math.floor(c.sampleRate * dur);
+  const buf = c.createBuffer(1, n, c.sampleRate);
+  const d = buf.getChannelData(0);
+  for(let i=0;i<n;i++) d[i] = Math.random()*2 - 1;
+  const src = c.createBufferSource(); src.buffer = buf;
+  const flt = c.createBiquadFilter(); flt.type = 'bandpass'; flt.Q.value = 0.55;
+  flt.frequency.setValueAtTime(f0, now);
+  flt.frequency.linearRampToValueAtTime(f1, now + dur);
+  const g = c.createGain();
+  g.gain.setValueAtTime(0.0001, now);
+  g.gain.linearRampToValueAtTime(gain, now + dur*0.32);   // soft attack
+  g.gain.exponentialRampToValueAtTime(0.0008, now + dur);
+  src.connect(flt); flt.connect(g); g.connect(c.destination);
+  src.start(now); src.stop(now + dur + 0.02);
+}
+
 /* --- card-game voices ----------------------------------------------------- */
-export const deal      = () => { noise({dur:0.05, gain:0.08, f0:2600, f1:1400, q:1.2}); tone({type:'square', from:680, to:520, dur:0.05, gain:0.05}); };
+export const deal      = () => { shh({dur:0.12, gain:0.035, f0:1600, f1:3000}); tone({type:'square', from:680, to:520, dur:0.05, gain:0.045}); };
 export const flip      = () => { tone({type:'square', from:430, to:880, dur:0.06, gain:0.07}); };
 export const pickup    = () => { tone({type:'triangle', from:300, to:420, dur:0.05, gain:0.06}); };
 export const place     = () => { tone({type:'square', from:520, to:700, dur:0.07, gain:0.07}); };
@@ -70,11 +90,15 @@ export const invalid   = () => { tone({type:'sawtooth', from:180, to:110, dur:0.
 /** Riffle shuffle — a burst of short filtered-noise ticks, then a soft settle. */
 export function shuffle(){
   const c = ac(); if(!c || muted) return;
+  // two soft "shhh" swooshes (the card-slide) ...
+  shh({t0:0.0,  dur:0.28, gain:0.05,  f0:700,  f1:3400});
+  shh({t0:0.24, dur:0.26, gain:0.045, f0:1100, f1:4200});
+  // ... with the crisp riffle ticks layered on top
   let t = 0;
   const ticks = 16;
   for(let i=0;i<ticks;i++){
     t += 0.018 + Math.random()*0.016;
-    noise({t0:t, dur:0.03, gain:0.05 + Math.random()*0.03, filter:'bandpass', f0:1500 + Math.random()*1800, q:1.4});
+    noise({t0:t, dur:0.03, gain:0.035 + Math.random()*0.02, filter:'bandpass', f0:1500 + Math.random()*1800, q:1.4});
   }
   // two soft thumps as the deck squares up
   tone({type:'triangle', from:160, to:90, t0:t+0.04, dur:0.12, gain:0.08});

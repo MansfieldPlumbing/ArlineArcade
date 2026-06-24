@@ -1,9 +1,7 @@
 /* ============================================================================
-   Arline Arcade — shared theme
-   Recipe distilled from art4quinn + MansfieldTeachesTyping + the Subsystem
-   theme.css CSS-variable contract. Vanilla CSS, no build step.
-   Fonts are local (assets/fonts) — url()s below resolve relative to THIS file,
-   so every page works regardless of its folder depth.
+   Arline Arcade — casino theme
+   Garish green felt + gaudy gold to match the logo. Vanilla CSS, no build.
+   Local fonts; url()s resolve relative to THIS file so every page works.
    ========================================================================== */
 
 @font-face{
@@ -18,146 +16,159 @@
 }
 
 :root{
-  /* color contract — change these, everything follows */
-  --ink:#0a0a0d;          /* base background          */
-  --ink-2:#111219;        /* raised panel             */
-  --paper:#ece9e2;        /* primary text             */
-  --muted:#a7a39a;        /* secondary text           */
-  --faint:#6f6b63;        /* tertiary text / rules    */
-  --accent:#c2a878;       /* warm gold (art4quinn)    */
-  --accent-2:#2f7d66;     /* casino felt green        */
-  --line:rgba(236,233,226,.12);
-  --card:rgba(255,255,255,.024);
-  --card-hover:rgba(194,168,120,.07);
+  --felt:#0c6b40;          /* table green        */
+  --felt-2:#085030;
+  --felt-edge:#04341f;
+  --gold:#e9c34a;          /* gaudy gold         */
+  --gold-2:#a9791a;
+  --gold-hi:#fff0b0;
+  --red:#d11f33;
+  --cream:#fff7e2;
+  --paper:#fdeec0;         /* text on felt       */
+  --muted:#cdb888;
+  --ink:#0c2417;
+  --line:rgba(233,195,74,.34);
 
   --display:"Selawik","Segoe UI",system-ui,sans-serif;
   --mono:"Cascadia Code NF",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;
   --body:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
 
-  --maxw:980px;
-  --radius:16px;
+  --maxw:1000px; --radius:18px;
+  --gold-grad:linear-gradient(180deg, var(--gold-hi), var(--gold) 45%, var(--gold-2));
 }
 
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{
-  margin:0; min-height:100dvh;
-  font-family:var(--body); color:var(--paper);
-  line-height:1.55; font-size:clamp(16px,1rem + .25vw,18px);
+  margin:0; min-height:100dvh; color:var(--paper);
+  font-family:var(--body); line-height:1.5; font-size:clamp(16px,1rem + .25vw,18px);
   background:
-    radial-gradient(1200px 720px at 50% -12%, rgba(194,168,120,.10), transparent 60%),
-    radial-gradient(900px 620px at 50% 118%, rgba(47,125,102,.16), transparent 60%),
-    var(--ink);
-  background-attachment:fixed;
+    radial-gradient(120% 85% at 50% 6%, var(--felt) 0%, var(--felt-2) 46%, var(--felt-edge) 100%) fixed;
+  position:relative;
   display:flex; flex-direction:column; align-items:center;
+}
+/* faint felt weave */
+body::after{
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.5;
+  background-image:
+    repeating-linear-gradient(45deg, rgba(255,255,255,.025) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(-45deg, rgba(0,0,0,.05) 0 1px, transparent 1px 3px);
 }
 a{color:inherit}
 
-/* ---- layout shell --------------------------------------------------------- */
-.wrap{width:100%; max-width:var(--maxw); padding:clamp(20px,5vw,56px) clamp(18px,5vw,32px); margin:0 auto}
+/* ---- layout --------------------------------------------------------------- */
+.wrap{width:100%; max-width:var(--maxw); padding:clamp(18px,4vw,44px) clamp(16px,4vw,30px); margin:0 auto}
 
-/* ---- site header ---------------------------------------------------------- */
-.site-header{display:flex; flex-direction:column; align-items:center; text-align:center; gap:.5rem; margin-bottom:clamp(28px,6vw,52px)}
-.monogram{
-  width:64px; height:64px; border-radius:14px;
-  display:grid; place-items:center;
-  background:linear-gradient(145deg,var(--ink-2),#000);
-  border:1px solid var(--line);
-  box-shadow:0 1px 0 rgba(255,255,255,.05) inset, 0 10px 30px rgba(0,0,0,.45);
-  color:var(--accent); font-size:30px; line-height:1;
+/* ---- header / logo -------------------------------------------------------- */
+.site-header{display:flex; flex-direction:column; align-items:center; text-align:center; gap:.7rem; margin-bottom:clamp(24px,5vw,46px)}
+.logo-img{
+  width:min(90vw,560px); height:auto; display:block;
+  filter:drop-shadow(0 6px 18px rgba(0,0,0,.55)) drop-shadow(0 0 26px rgba(233,195,74,.30));
 }
-.wordmark{
-  font-family:var(--display); font-weight:700;
-  font-size:clamp(2rem,7vw,3.4rem); letter-spacing:.01em; margin:.2rem 0 0;
+.tagline{
+  font-family:var(--mono); font-size:.8rem; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--gold-hi); padding:.4rem 1rem; border:1px solid var(--line); border-radius:999px;
+  background:rgba(0,0,0,.18);
 }
-.wordmark .amp{color:var(--accent)}
-.rule{width:54px; height:1px; background:linear-gradient(90deg,transparent,var(--accent),transparent); margin:.35rem 0 .1rem}
-.tagline{font-family:var(--mono); font-size:.82rem; letter-spacing:.18em; text-transform:uppercase; color:var(--muted)}
+/* legacy header bits kept harmless if present */
+.monogram,.wordmark,.rule{display:none}
 
 /* ---- game grid ------------------------------------------------------------ */
-.grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(236px,1fr)); gap:clamp(14px,2.4vw,20px)}
+.grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(248px,1fr)); gap:clamp(14px,2.4vw,22px)}
 .tile{
   position:relative; display:flex; flex-direction:column; gap:.35rem;
-  padding:clamp(20px,3vw,26px); min-height:178px;
-  background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
-  text-decoration:none; color:var(--paper);
-  transition:transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+  padding:clamp(20px,3vw,28px); min-height:188px; text-decoration:none; color:var(--cream);
+  background:
+    linear-gradient(180deg, rgba(10,70,42,.92), rgba(6,52,31,.96));
+  border:3px solid transparent;
+  border-radius:var(--radius);
+  /* gaudy gold frame via layered shadows */
+  box-shadow:
+    0 0 0 3px var(--gold-2),
+    0 0 0 4px rgba(0,0,0,.35),
+    inset 0 0 0 2px rgba(255,240,176,.25),
+    inset 0 18px 40px rgba(0,0,0,.35),
+    0 14px 30px rgba(0,0,0,.4);
+  transition:transform .16s ease, box-shadow .16s ease;
   overflow:hidden;
 }
-.tile::before{ /* accent bar that grows on hover */
-  content:""; position:absolute; left:0; top:0; bottom:0; width:3px;
-  background:linear-gradient(var(--accent),var(--accent-2)); transform:scaleY(.0); transform-origin:top;
-  transition:transform .22s ease;
+.tile::before{ /* sheen */
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(120% 60% at 50% -20%, rgba(255,255,255,.12), transparent 60%);
 }
 .tile:hover,.tile:focus-visible{
-  transform:translateY(-3px); background:var(--card-hover);
-  border-color:rgba(194,168,120,.4); box-shadow:0 14px 40px rgba(0,0,0,.4); outline:none;
+  transform:translateY(-4px); outline:none;
+  box-shadow:
+    0 0 0 3px var(--gold),
+    0 0 0 5px rgba(0,0,0,.35),
+    inset 0 0 0 2px rgba(255,240,176,.4),
+    inset 0 18px 40px rgba(0,0,0,.3),
+    0 18px 44px rgba(0,0,0,.5),
+    0 0 34px rgba(233,195,74,.45);
 }
-.tile:hover::before,.tile:focus-visible::before{transform:scaleY(1)}
-.tile .idx{font-family:var(--mono); font-size:.78rem; color:var(--faint); letter-spacing:.1em}
-.tile .suit{position:absolute; right:18px; top:14px; font-size:1.5rem; color:var(--accent); opacity:.55}
-.tile h2{font-family:var(--display); font-weight:700; font-size:1.5rem; margin:.1rem 0 0}
-.tile p{margin:0; color:var(--muted); font-size:.96rem}
-.tile .go{margin-top:auto; font-family:var(--mono); font-size:.82rem; color:var(--accent); display:inline-flex; align-items:center; gap:.4rem}
+.tile .idx{font-family:var(--mono); font-size:.78rem; color:var(--gold); letter-spacing:.12em}
+.tile .suit{position:absolute; right:16px; top:14px; font-size:1.7rem; color:var(--gold); opacity:.8; text-shadow:0 1px 4px rgba(0,0,0,.5)}
+.tile h2{
+  font-family:var(--display); font-weight:700; font-size:1.6rem; margin:.1rem 0 0;
+  background:var(--gold-grad); -webkit-background-clip:text; background-clip:text; color:transparent;
+  text-shadow:0 1px 0 rgba(0,0,0,.25);
+}
+.tile p{margin:0; color:var(--paper); font-size:.97rem; opacity:.92}
+.tile .go{margin-top:auto; font-family:var(--mono); font-size:.82rem; color:var(--gold-hi); display:inline-flex; align-items:center; gap:.4rem}
 .tile .go::after{content:"→"; transition:transform .2s ease}
 .tile:hover .go::after{transform:translateX(4px)}
 .tile .badge{
   position:absolute; right:14px; bottom:14px; font-family:var(--mono); font-size:.62rem; letter-spacing:.12em;
-  text-transform:uppercase; color:var(--ink); background:var(--accent); padding:.2rem .5rem; border-radius:999px;
+  text-transform:uppercase; color:var(--ink); background:var(--gold-grad); padding:.22rem .55rem; border-radius:999px;
+  box-shadow:0 1px 3px rgba(0,0,0,.4);
 }
-.tile.soon{opacity:.92}
-.tile.soon .go{color:var(--muted)}
 
 /* ---- footer --------------------------------------------------------------- */
-.site-footer{margin-top:clamp(34px,7vw,64px); text-align:center; color:var(--faint); font-size:.86rem}
-.site-footer .heart{color:var(--accent)}
-.site-footer a{color:var(--muted); text-decoration:none; border-bottom:1px solid var(--line)}
+.site-footer{margin-top:clamp(30px,6vw,58px); text-align:center; color:var(--muted); font-size:.88rem}
+.site-footer .heart{color:var(--red)}
+.site-footer a{color:var(--gold); text-decoration:none; border-bottom:1px solid var(--line)}
 
-/* ---- game-page chrome (used by stubs / wrappers) -------------------------- */
-.topbar{width:100%; max-width:var(--maxw); display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:clamp(14px,3vw,22px) clamp(18px,5vw,32px); margin:0 auto}
-.back{font-family:var(--mono); font-size:.85rem; color:var(--muted); text-decoration:none; display:inline-flex; align-items:center; gap:.45rem; padding:.45rem .7rem; border:1px solid var(--line); border-radius:999px; transition:border-color .18s ease, color .18s ease}
-.back:hover{color:var(--paper); border-color:rgba(194,168,120,.45)}
-.crumb{font-family:var(--mono); font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; color:var(--faint)}
+/* ---- game-page chrome (stubs / wrappers) ---------------------------------- */
+.topbar{width:100%; max-width:var(--maxw); display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:clamp(14px,3vw,22px) clamp(16px,4vw,30px); margin:0 auto}
+.back{font-family:var(--mono); font-size:.85rem; color:var(--gold-hi); text-decoration:none; display:inline-flex; align-items:center; gap:.45rem; padding:.5rem .8rem; border:1px solid var(--line); border-radius:999px; background:rgba(0,0,0,.22); transition:border-color .16s, box-shadow .16s}
+.back:hover{border-color:var(--gold); box-shadow:0 0 18px rgba(233,195,74,.35)}
+.crumb{font-family:var(--mono); font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; color:var(--gold)}
 
 .stub{width:100%; max-width:560px; margin:clamp(40px,12vw,120px) auto; text-align:center; padding:0 24px}
-.stub .big{font-size:clamp(3rem,16vw,5.5rem); color:var(--accent); line-height:1}
-.stub h1{font-family:var(--display); font-weight:700; font-size:clamp(2rem,8vw,3rem); margin:.6rem 0 .2rem}
-.stub p{color:var(--muted); margin:.2rem 0 1.4rem}
-.stub .soon-pill{font-family:var(--mono); font-size:.72rem; letter-spacing:.16em; text-transform:uppercase; color:var(--ink); background:var(--accent); padding:.3rem .8rem; border-radius:999px}
-
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.stub .big{font-size:clamp(3rem,16vw,5.5rem); color:var(--gold); text-shadow:0 2px 10px rgba(0,0,0,.5)}
+.stub h1{font-family:var(--display); font-weight:700; font-size:clamp(2rem,8vw,3rem); margin:.5rem 0 .2rem; background:var(--gold-grad); -webkit-background-clip:text; background-clip:text; color:transparent}
+.stub p{color:var(--paper); margin:.2rem 0 1.4rem; opacity:.9}
+.stub .soon-pill{font-family:var(--mono); font-size:.72rem; letter-spacing:.16em; text-transform:uppercase; color:var(--ink); background:var(--gold-grad); padding:.32rem .85rem; border-radius:999px}
 
 /* ---- cinematic intro ------------------------------------------------------ */
 body.intro-lock{ overflow:hidden }
 #intro{
-  position:fixed; inset:0; z-index:1000; display:grid; place-items:center; overflow:hidden;
-  cursor:pointer;
-  background:
-    radial-gradient(120% 90% at 50% 16%, rgba(47,125,102,.28), transparent 60%),
-    radial-gradient(140% 120% at 50% 120%, rgba(0,0,0,.75), transparent 60%),
-    #06080c;
+  position:fixed; inset:0; z-index:1000; display:grid; place-items:center; overflow:hidden; cursor:pointer;
+  background:radial-gradient(120% 90% at 50% 12%, var(--felt) 0%, var(--felt-2) 45%, #021a0f 100%);
 }
 #intro.gone{ opacity:0; transition:opacity .62s ease; pointer-events:none }
 #introgl{ position:absolute; inset:0; width:100%; height:100%; display:block }
 #introLogo{
-  position:relative; z-index:2; width:min(86vw,640px); max-width:640px; height:auto;
+  position:relative; z-index:2; width:min(88vw,640px); max-width:640px; height:auto;
   transform:scale(.2); opacity:0; will-change:transform,opacity;
-  filter:drop-shadow(0 14px 40px rgba(0,0,0,.6)) drop-shadow(0 0 30px rgba(194,168,120,.28));
+  filter:drop-shadow(0 14px 40px rgba(0,0,0,.6)) drop-shadow(0 0 34px rgba(233,195,74,.4));
 }
 #introLogo.pop{ animation:logoPop 1s cubic-bezier(.16,1.4,.3,1) forwards }
 @keyframes logoPop{
   0%{ transform:scale(.2) rotate(-7deg); opacity:0 }
   55%{ opacity:1 }
-  70%{ transform:scale(1.06) rotate(1.5deg) }
+  70%{ transform:scale(1.07) rotate(1.5deg) }
   100%{ transform:scale(1) rotate(0); opacity:1 }
 }
 #introSkip{
   position:absolute; z-index:3; bottom:6%; left:50%; transform:translateX(-50%);
-  font-family:var(--mono); font-size:.8rem; letter-spacing:.06em; color:var(--paper);
-  background:rgba(0,0,0,.35); border:1px solid var(--line); border-radius:999px;
-  padding:.55rem 1.1rem; cursor:pointer; -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
-  animation:skipFade .6s ease 1.2s both;
+  font-family:var(--mono); font-size:.8rem; letter-spacing:.06em; color:var(--ink);
+  background:var(--gold-grad); border:none; border-radius:999px; padding:.55rem 1.2rem; cursor:pointer; font-weight:700;
+  box-shadow:0 4px 14px rgba(0,0,0,.4); animation:skipFade .6s ease 1.2s both;
 }
-#introSkip:hover{ border-color:rgba(194,168,120,.5) }
-@keyframes skipFade{ from{opacity:0} to{opacity:.85} }
-@media (prefers-reduced-motion:reduce){ #introLogo{ transform:none; opacity:1 } #introLogo.pop{ animation:none } }
+@keyframes skipFade{ from{opacity:0} to{opacity:.95} }
+
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important}
+  #introLogo{ transform:none; opacity:1 } #introLogo.pop{ animation:none }
+}
