@@ -1,0 +1,13 @@
+{
+  "name": "Arline Arcade",
+  "short_name": "Arcade",
+  "description": "A cozy, ad-free arcade — solitaire, uno, minesweeper and more.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0a0a0d",
+  "theme_color": "#0a0a0d",
+  "icons": [
+    { "src": "assets/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

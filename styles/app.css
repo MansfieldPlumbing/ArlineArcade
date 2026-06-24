@@ -1,0 +1,128 @@
+/* ============================================================================
+   Arline Arcade — shared theme
+   Recipe distilled from art4quinn + MansfieldTeachesTyping + the Subsystem
+   theme.css CSS-variable contract. Vanilla CSS, no build step.
+   Fonts are local (assets/fonts) — url()s below resolve relative to THIS file,
+   so every page works regardless of its folder depth.
+   ========================================================================== */
+
+@font-face{
+  font-family:"Selawik";
+  src:url("../assets/fonts/selawk.ttf") format("truetype");
+  font-weight:300 700; font-display:swap;
+}
+@font-face{
+  font-family:"Cascadia Code NF";
+  src:url("../assets/fonts/CascadiaCodeNF.ttf") format("truetype");
+  font-weight:200 700; font-display:swap;
+}
+
+:root{
+  /* color contract — change these, everything follows */
+  --ink:#0a0a0d;          /* base background          */
+  --ink-2:#111219;        /* raised panel             */
+  --paper:#ece9e2;        /* primary text             */
+  --muted:#a7a39a;        /* secondary text           */
+  --faint:#6f6b63;        /* tertiary text / rules    */
+  --accent:#c2a878;       /* warm gold (art4quinn)    */
+  --accent-2:#2f7d66;     /* casino felt green        */
+  --line:rgba(236,233,226,.12);
+  --card:rgba(255,255,255,.024);
+  --card-hover:rgba(194,168,120,.07);
+
+  --display:"Selawik","Segoe UI",system-ui,sans-serif;
+  --mono:"Cascadia Code NF",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;
+  --body:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+
+  --maxw:980px;
+  --radius:16px;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; min-height:100dvh;
+  font-family:var(--body); color:var(--paper);
+  line-height:1.55; font-size:clamp(16px,1rem + .25vw,18px);
+  background:
+    radial-gradient(1200px 720px at 50% -12%, rgba(194,168,120,.10), transparent 60%),
+    radial-gradient(900px 620px at 50% 118%, rgba(47,125,102,.16), transparent 60%),
+    var(--ink);
+  background-attachment:fixed;
+  display:flex; flex-direction:column; align-items:center;
+}
+a{color:inherit}
+
+/* ---- layout shell --------------------------------------------------------- */
+.wrap{width:100%; max-width:var(--maxw); padding:clamp(20px,5vw,56px) clamp(18px,5vw,32px); margin:0 auto}
+
+/* ---- site header ---------------------------------------------------------- */
+.site-header{display:flex; flex-direction:column; align-items:center; text-align:center; gap:.5rem; margin-bottom:clamp(28px,6vw,52px)}
+.monogram{
+  width:64px; height:64px; border-radius:14px;
+  display:grid; place-items:center;
+  background:linear-gradient(145deg,var(--ink-2),#000);
+  border:1px solid var(--line);
+  box-shadow:0 1px 0 rgba(255,255,255,.05) inset, 0 10px 30px rgba(0,0,0,.45);
+  color:var(--accent); font-size:30px; line-height:1;
+}
+.wordmark{
+  font-family:var(--display); font-weight:700;
+  font-size:clamp(2rem,7vw,3.4rem); letter-spacing:.01em; margin:.2rem 0 0;
+}
+.wordmark .amp{color:var(--accent)}
+.rule{width:54px; height:1px; background:linear-gradient(90deg,transparent,var(--accent),transparent); margin:.35rem 0 .1rem}
+.tagline{font-family:var(--mono); font-size:.82rem; letter-spacing:.18em; text-transform:uppercase; color:var(--muted)}
+
+/* ---- game grid ------------------------------------------------------------ */
+.grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(236px,1fr)); gap:clamp(14px,2.4vw,20px)}
+.tile{
+  position:relative; display:flex; flex-direction:column; gap:.35rem;
+  padding:clamp(20px,3vw,26px); min-height:178px;
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+  text-decoration:none; color:var(--paper);
+  transition:transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+  overflow:hidden;
+}
+.tile::before{ /* accent bar that grows on hover */
+  content:""; position:absolute; left:0; top:0; bottom:0; width:3px;
+  background:linear-gradient(var(--accent),var(--accent-2)); transform:scaleY(.0); transform-origin:top;
+  transition:transform .22s ease;
+}
+.tile:hover,.tile:focus-visible{
+  transform:translateY(-3px); background:var(--card-hover);
+  border-color:rgba(194,168,120,.4); box-shadow:0 14px 40px rgba(0,0,0,.4); outline:none;
+}
+.tile:hover::before,.tile:focus-visible::before{transform:scaleY(1)}
+.tile .idx{font-family:var(--mono); font-size:.78rem; color:var(--faint); letter-spacing:.1em}
+.tile .suit{position:absolute; right:18px; top:14px; font-size:1.5rem; color:var(--accent); opacity:.55}
+.tile h2{font-family:var(--display); font-weight:700; font-size:1.5rem; margin:.1rem 0 0}
+.tile p{margin:0; color:var(--muted); font-size:.96rem}
+.tile .go{margin-top:auto; font-family:var(--mono); font-size:.82rem; color:var(--accent); display:inline-flex; align-items:center; gap:.4rem}
+.tile .go::after{content:"→"; transition:transform .2s ease}
+.tile:hover .go::after{transform:translateX(4px)}
+.tile .badge{
+  position:absolute; right:14px; bottom:14px; font-family:var(--mono); font-size:.62rem; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--ink); background:var(--accent); padding:.2rem .5rem; border-radius:999px;
+}
+.tile.soon{opacity:.92}
+.tile.soon .go{color:var(--muted)}
+
+/* ---- footer --------------------------------------------------------------- */
+.site-footer{margin-top:clamp(34px,7vw,64px); text-align:center; color:var(--faint); font-size:.86rem}
+.site-footer .heart{color:var(--accent)}
+.site-footer a{color:var(--muted); text-decoration:none; border-bottom:1px solid var(--line)}
+
+/* ---- game-page chrome (used by stubs / wrappers) -------------------------- */
+.topbar{width:100%; max-width:var(--maxw); display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:clamp(14px,3vw,22px) clamp(18px,5vw,32px); margin:0 auto}
+.back{font-family:var(--mono); font-size:.85rem; color:var(--muted); text-decoration:none; display:inline-flex; align-items:center; gap:.45rem; padding:.45rem .7rem; border:1px solid var(--line); border-radius:999px; transition:border-color .18s ease, color .18s ease}
+.back:hover{color:var(--paper); border-color:rgba(194,168,120,.45)}
+.crumb{font-family:var(--mono); font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; color:var(--faint)}
+
+.stub{width:100%; max-width:560px; margin:clamp(40px,12vw,120px) auto; text-align:center; padding:0 24px}
+.stub .big{font-size:clamp(3rem,16vw,5.5rem); color:var(--accent); line-height:1}
+.stub h1{font-family:var(--display); font-weight:700; font-size:clamp(2rem,8vw,3rem); margin:.6rem 0 .2rem}
+.stub p{color:var(--muted); margin:.2rem 0 1.4rem}
+.stub .soon-pill{font-family:var(--mono); font-size:.72rem; letter-spacing:.16em; text-transform:uppercase; color:var(--ink); background:var(--accent); padding:.3rem .8rem; border-radius:999px}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
