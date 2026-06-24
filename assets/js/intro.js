@@ -146,19 +146,16 @@ float mHeart(vec2 p){
   return max(a, mTri(p, vec2(-0.66,0.34), vec2(0.66,0.34), vec2(0.0,-0.80)));
 }
 float mSpade(vec2 p){
-  vec2 q = vec2(p.x, -p.y);
-  float a = mHeart(q);
-  a = max(a, mBox(p, vec2(0.0,-0.46), vec2(0.07,0.22), 0.02));   // stem
-  a = max(a, mBox(p, vec2(0.0,-0.62), vec2(0.24,0.05), 0.03));   // foot
-  return a;
+  float a = mTri(p, vec2(0.0,0.92), vec2(-0.58,-0.14), vec2(0.58,-0.14));   // pointed body
+  a = max(a, mCircle(p, vec2(-0.32,-0.20), 0.33));                           // bottom lobes
+  a = max(a, mCircle(p, vec2(0.32,-0.20), 0.33));
+  return max(a, mTri(p, vec2(0.0,-0.10), vec2(-0.20,-0.64), vec2(0.20,-0.64))); // flared stem
 }
 float mClub(vec2 p){
   float a = mCircle(p, vec2(0.0,0.34), 0.30);
   a = max(a, mCircle(p, vec2(-0.32,-0.06), 0.30));
   a = max(a, mCircle(p, vec2(0.32,-0.06), 0.30));
-  a = max(a, mBox(p, vec2(0.0,-0.44), vec2(0.08,0.24), 0.03));   // stem
-  a = max(a, mBox(p, vec2(0.0,-0.62), vec2(0.22,0.05), 0.03));   // foot
-  return a;
+  return max(a, mTri(p, vec2(0.0,-0.04), vec2(-0.17,-0.60), vec2(0.17,-0.60))); // flared stem
 }
 float suitMask(vec2 p, int s){
   if(s==0) return mDiamond(p);
