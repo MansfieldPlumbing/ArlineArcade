@@ -1,0 +1,85 @@
+/* Arline Arcade — Uno table. Cards are CSS-drawn in the classic 4 colors;
+   the felt + gold theme comes from app.css. Built to read big on a phone. */
+
+.uno-table{
+  width:100%; max-width:760px; margin:0 auto; padding:10px clamp(10px,3vw,22px) 26px;
+  display:flex; flex-direction:column; gap:clamp(10px,2.5vw,18px); min-height:70vh;
+}
+
+/* ---- opponents ---- */
+.opp-row{ display:flex; justify-content:center; gap:clamp(14px,6vw,46px) }
+.opp{ display:flex; flex-direction:column; align-items:center; gap:.3rem; opacity:.85; transition:opacity .2s, transform .2s }
+.opp.active{ opacity:1; transform:translateY(2px) }
+.opp .stack{ position:relative; --cw:34px }
+.opp .count{
+  position:absolute; right:-10px; top:-8px; min-width:20px; height:20px; padding:0 5px;
+  display:grid; place-items:center; border-radius:999px; font:700 .72rem/1 var(--mono,monospace);
+  color:var(--ink,#0c2417); background:var(--gold-grad,gold); box-shadow:0 1px 3px rgba(0,0,0,.5);
+}
+.opp .oname{ font-family:var(--mono,monospace); font-size:.72rem; letter-spacing:.08em; color:var(--paper,#fde) }
+.opp.active .oname{ color:var(--gold-hi,#ffe9a0) }
+.opp.active .stack::after{ content:""; position:absolute; inset:-6px; border-radius:12px; box-shadow:0 0 0 2px var(--gold,gold), 0 0 18px rgba(233,195,74,.6) }
+
+/* ---- play area ---- */
+.play-area{ display:flex; align-items:center; justify-content:center; gap:clamp(12px,4vw,30px); padding:clamp(8px,2vw,16px) 0 }
+.pile{ position:relative; --cw:66px; background:none; border:none; padding:0; cursor:default }
+.pile.draw{ cursor:pointer }
+.pile.draw[disabled]{ cursor:default; opacity:.7 }
+.pile .plabel{ position:absolute; left:50%; bottom:-20px; transform:translateX(-50%); font:700 .7rem/1 var(--mono,monospace); color:var(--gold-hi,#ffe9a0) }
+.status{ display:flex; flex-direction:column; align-items:center; gap:.35rem; min-width:88px }
+.status .turn{ font-family:var(--mono,monospace); font-size:.82rem; color:var(--paper,#fde); text-align:center }
+.status .dir{ font-size:1.3rem; color:var(--gold-hi,#ffe9a0) }
+.swatch{ width:30px; height:30px; border-radius:50%; box-shadow:inset 0 0 0 2px rgba(255,255,255,.5), 0 2px 6px rgba(0,0,0,.5) }
+.sc-red{ background:#d4322c } .sc-yellow{ background:#f0c000 } .sc-green{ background:#39a14a } .sc-blue{ background:#1f6fd0 }
+.sc-wild{ background:conic-gradient(#d4322c 0 25%, #f0c000 0 50%, #39a14a 0 75%, #1f6fd0 0) }
+
+/* ---- a card ---- */
+.uno-card{
+  position:relative; width:var(--cw,72px); height:calc(var(--cw,72px) * 1.5);
+  border-radius:calc(var(--cw,72px) * 0.16); color:#fff; font-weight:800; overflow:hidden;
+  border:2px solid rgba(255,255,255,.55);
+  box-shadow:0 4px 10px rgba(0,0,0,.45), inset 0 0 0 2px rgba(0,0,0,.12);
+}
+.uno-card .pip{
+  position:absolute; inset:16% 11%; display:grid; place-items:center;
+  background:#fbf7ec; border-radius:50% / 42%; transform:rotate(-20deg);
+  font-size:calc(var(--cw,72px) * 0.52); line-height:1;
+}
+.uno-card .corner{ position:absolute; font-size:calc(var(--cw,72px) * 0.24); text-shadow:0 1px 2px rgba(0,0,0,.4) }
+.uno-card .corner.tl{ top:4%; left:7% } .uno-card .corner.br{ bottom:4%; right:7%; transform:rotate(180deg) }
+.c-red{ background:linear-gradient(155deg,#e0463f,#b81e18) }    .c-red .pip{ color:#c4201a }
+.c-yellow{ background:linear-gradient(155deg,#f4cf2a,#d9a800) } .c-yellow .pip{ color:#caa400 }
+.c-green{ background:linear-gradient(155deg,#43b257,#2c8f3c) }  .c-green .pip{ color:#2e8f3e }
+.c-blue{ background:linear-gradient(155deg,#2f86e0,#1559b0) }   .c-blue .pip{ color:#1c63bd }
+.c-wild{ background:linear-gradient(155deg,#2a2a2e,#050507) }   .c-wild .pip{ background:conic-gradient(#d4322c 0 25%,#f0c000 0 50%,#39a14a 0 75%,#1f6fd0 0); color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.7) }
+.uno-card.back{ background:linear-gradient(155deg,#0e7a48,#064a2c); border-color:rgba(233,195,74,.5) }
+.uno-card.back .pip{ background:none; color:var(--gold-hi,#ffe9a0); transform:rotate(-20deg); font-size:calc(var(--cw,72px)*0.3); font-family:var(--mono,monospace) }
+
+/* ---- your hand ---- */
+.hand{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px; padding:6px 0 2px; min-height:120px }
+.card-btn{ --cw:clamp(54px,15vw,72px); background:none; border:none; padding:0; cursor:pointer; transition:transform .14s ease, filter .14s ease; border-radius:12px }
+.card-btn.legal{ transform:translateY(-10px) }
+.card-btn.legal .uno-card{ box-shadow:0 8px 16px rgba(0,0,0,.5), 0 0 0 2px var(--gold,gold), 0 0 20px rgba(233,195,74,.55) }
+.card-btn:not(.legal){ filter:brightness(.86) saturate(.9) }
+.card-btn.shake{ animation:unoShake .3s }
+@keyframes unoShake{ 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+
+/* ---- controls ---- */
+.controls{ display:flex; justify-content:center; min-height:46px }
+.ctl{
+  font:700 .9rem/1 var(--mono,monospace); color:var(--ink,#0c2417); background:var(--gold-grad,gold);
+  border:none; border-radius:999px; padding:.7rem 1.5rem; cursor:pointer;
+  box-shadow:0 4px 14px rgba(0,0,0,.45); transition:transform .14s ease, box-shadow .14s ease;
+}
+.ctl:hover{ transform:translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,.5), 0 0 22px rgba(233,195,74,.5) }
+
+/* ---- overlays (color pick + win) ---- */
+.overlay{ position:fixed; inset:0; z-index:1100; display:grid; place-items:center; background:rgba(3,12,7,.72); -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px) }
+.panel{ background:linear-gradient(180deg,rgba(12,70,42,.96),rgba(6,42,26,.98)); border-radius:18px; padding:clamp(20px,5vw,34px); text-align:center;
+  box-shadow:0 0 0 3px var(--gold-2,#a9791a), inset 0 0 0 2px rgba(255,240,176,.25), 0 20px 50px rgba(0,0,0,.6) }
+.panel .big{ font-size:3rem }
+.panel h3{ font-family:var(--display,sans-serif); font-size:clamp(1.4rem,5vw,2rem); margin:.3rem 0 1rem;
+  background:var(--gold-grad,gold); -webkit-background-clip:text; background-clip:text; color:transparent }
+.picks{ display:flex; gap:14px; justify-content:center }
+.pick{ width:54px; height:54px; border-radius:50%; border:3px solid rgba(255,255,255,.6); cursor:pointer; transition:transform .14s }
+.pick:hover{ transform:scale(1.12) }
