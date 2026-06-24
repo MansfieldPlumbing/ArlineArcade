@@ -1,0 +1,92 @@
+/* ============================================================================
+   Arline Arcade — shared chiptune SFX engine
+   Procedural Web Audio (no sound files). Recipe house-style: a tone() synth
+   (osc + gain envelope + pitch glide) and a noise() generator (buffer -> filter),
+   the same approach as MansfieldTeachesTyping's audio.js.
+   Mobile-safe: the AudioContext is created lazily and resumed on first gesture.
+   ========================================================================== */
+
+let ctx = null;
+let muted = false;
+
+function ac(){
+  if(!ctx){
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return null;
+    ctx = new AC();
+  }
+  return ctx;
+}
+
+/** Call from a user gesture (pointerdown) so iOS/Android will let audio play. */
+export function unlock(){ const c = ac(); if(c && c.state === 'suspended') c.resume(); }
+export function toggleMute(){ muted = !muted; return muted; }
+export function isMuted(){ return muted; }
+export function setMuted(v){ muted = !!v; }
+
+/* --- primitives ----------------------------------------------------------- */
+function tone({type='square', from, to, t0=0, dur=0.1, gain=0.1, glide='exp'}){
+  const c = ac(); if(!c || muted) return;
+  const now = c.currentTime + t0;
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = type;
+  o.frequency.setValueAtTime(from, now);
+  if(to != null){
+    if(glide === 'exp') o.frequency.exponentialRampToValueAtTime(Math.max(1,to), now + dur);
+    else o.frequency.linearRampToValueAtTime(to, now + dur);
+  }
+  g.gain.setValueAtTime(gain, now);
+  g.gain.exponentialRampToValueAtTime(0.0008, now + dur);
+  o.connect(g); g.connect(c.destination);
+  o.start(now); o.stop(now + dur + 0.02);
+}
+
+function noise({t0=0, dur=0.1, gain=0.1, filter='bandpass', f0=1800, f1, q=0.8}){
+  const c = ac(); if(!c || muted) return;
+  const now = c.currentTime + t0;
+  const n = Math.floor(c.sampleRate * dur);
+  const buf = c.createBuffer(1, n, c.sampleRate);
+  const d = buf.getChannelData(0);
+  for(let i=0;i<n;i++) d[i] = Math.random()*2 - 1;
+  const src = c.createBufferSource(); src.buffer = buf;
+  const flt = c.createBiquadFilter(); flt.type = filter; flt.Q.value = q;
+  flt.frequency.setValueAtTime(f0, now);
+  if(f1 != null) flt.frequency.exponentialRampToValueAtTime(f1, now + dur);
+  const g = c.createGain();
+  g.gain.setValueAtTime(gain, now);
+  g.gain.exponentialRampToValueAtTime(0.0008, now + dur);
+  src.connect(flt); flt.connect(g); g.connect(c.destination);
+  src.start(now); src.stop(now + dur + 0.02);
+}
+
+/* --- card-game voices ----------------------------------------------------- */
+export const deal      = () => { noise({dur:0.05, gain:0.08, f0:2600, f1:1400, q:1.2}); tone({type:'square', from:680, to:520, dur:0.05, gain:0.05}); };
+export const flip      = () => { tone({type:'square', from:430, to:880, dur:0.06, gain:0.07}); };
+export const pickup    = () => { tone({type:'triangle', from:300, to:420, dur:0.05, gain:0.06}); };
+export const place     = () => { tone({type:'square', from:520, to:700, dur:0.07, gain:0.07}); };
+export const foundation= () => { tone({type:'sine', from:760, to:1280, dur:0.14, gain:0.09}); tone({type:'square', from:1180, t0:0.05, dur:0.1, gain:0.04}); };
+export const invalid   = () => { tone({type:'sawtooth', from:180, to:110, dur:0.18, gain:0.09, glide:'lin'}); };
+
+/** Riffle shuffle — a burst of short filtered-noise ticks, then a soft settle. */
+export function shuffle(){
+  const c = ac(); if(!c || muted) return;
+  let t = 0;
+  const ticks = 16;
+  for(let i=0;i<ticks;i++){
+    t += 0.018 + Math.random()*0.016;
+    noise({t0:t, dur:0.03, gain:0.05 + Math.random()*0.03, filter:'bandpass', f0:1500 + Math.random()*1800, q:1.4});
+  }
+  // two soft thumps as the deck squares up
+  tone({type:'triangle', from:160, to:90, t0:t+0.04, dur:0.12, gain:0.08});
+  tone({type:'triangle', from:150, to:80, t0:t+0.16, dur:0.12, gain:0.07});
+}
+
+/** Triumphant little arpeggio. */
+export function win(){
+  const notes = [523.25, 659.25, 783.99, 1046.5, 1318.5]; // C5 E5 G5 C6 E6
+  let t = 0;
+  notes.forEach((f,i)=>{ tone({type:'triangle', from:f, dur:i===4?0.32:0.12, gain:0.09, t0:t}); t += (i===4?0.32:0.12) + 0.02; });
+  notes.forEach((f,i)=>{ tone({type:'square', from:f*2, dur:0.08, gain:0.03, t0:i*0.14}); });
+}
+
+export default { unlock, toggleMute, isMuted, setMuted, deal, flip, pickup, place, foundation, invalid, shuffle, win };

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arline Arcade — ad-free games</title>
+<meta name="description" content="A cozy, ad-free arcade. Solitaire, Uno, Minesweeper and more — no sign-ups, no ads, just games.">
+<meta name="theme-color" content="#0a0a0d">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="styles/app.css">
+</head>
+<body>
+
+<div id="intro" aria-hidden="true">
+  <canvas id="introgl"></canvas>
+  <img id="introLogo" src="assets/arlinearcade-logo.png" alt="Arline Arcade" decoding="async">
+  <button id="introSkip" type="button">Tap to enter &rsaquo;</button>
+</div>
+
+<main class="wrap">
+
+  <header class="site-header">
+    <div class="monogram">&#9824;</div>
+    <h1 class="wordmark">Arline <span class="amp">&amp;</span> Arcade</h1>
+    <div class="rule"></div>
+    <p class="tagline">Ad-free &middot; No sign-ups &middot; Just games</p>
+  </header>
+
+  <section class="grid" aria-label="Games">
+
+    <a class="tile" href="games/solitaire/" >
+      <span class="suit">&#9824;</span>
+      <span class="idx">01</span>
+      <h2>Solitaire</h2>
+      <p>The classic Klondike. Stack them down, build them up, clear the board.</p>
+      <span class="go">Play</span>
+      <span class="badge">Soon</span>
+    </a>
+
+    <a class="tile" href="games/uno/">
+      <span class="suit">&#9829;</span>
+      <span class="idx">02</span>
+      <h2>Uno</h2>
+      <p>Match colors and numbers, drop your wild cards, be first to empty your hand.</p>
+      <span class="go">Play</span>
+      <span class="badge">Soon</span>
+    </a>
+
+    <a class="tile" href="games/minesweeper/">
+      <span class="suit">&#9830;</span>
+      <span class="idx">03</span>
+      <h2>Minesweeper</h2>
+      <p>Read the numbers, flag the mines, clear every safe square without a boom.</p>
+      <span class="go">Play</span>
+    </a>
+
+    <a class="tile" href="games/painter/">
+      <span class="suit">&#9827;</span>
+      <span class="idx">04</span>
+      <h2>Painter</h2>
+      <p>A calm little canvas. Doodle, paint, and make something just for fun.</p>
+      <span class="go">Open</span>
+    </a>
+
+  </section>
+
+  <footer class="site-footer">
+    <p>Made with <span class="heart">&#9829;</span> for Arline &middot; more games on the way</p>
+  </footer>
+
+</main>
+
+<script type="module" src="assets/js/intro.js"></script>
+</body>
+</html>
