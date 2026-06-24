@@ -16,9 +16,14 @@ const canvas = document.getElementById('introgl');
 const logo  = document.getElementById('introLogo');
 const skip  = document.getElementById('introSkip');
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const force = /[?&]intro(=|&|$)/.test(location.search) || location.hash === '#intro';
+
+// "Replay intro" lives in the arcade (outside the overlay), so wire it always.
+const replayBtn = document.getElementById('introReplay');
+if(replayBtn) replayBtn.addEventListener('click', ()=>{ sessionStorage.removeItem(SEEN_KEY); location.reload(); });
 
 if(!intro){ /* not the home page */ }
-else if(sessionStorage.getItem(SEEN_KEY)){ removeIntro(true); }
+else if(!force && sessionStorage.getItem(SEEN_KEY)){ removeIntro(true); }
 else { start(); }
 
 function removeIntro(instant){

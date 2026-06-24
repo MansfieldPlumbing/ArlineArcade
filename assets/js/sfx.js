@@ -20,6 +20,7 @@ function ac(){
 
 /** Call from a user gesture (pointerdown) so iOS/Android will let audio play. */
 export function unlock(){ const c = ac(); if(c && c.state === 'suspended') c.resume(); }
+export function context(){ return ac(); }   // shared AudioContext (used by music.js)
 export function toggleMute(){ muted = !muted; return muted; }
 export function isMuted(){ return muted; }
 export function setMuted(v){ muted = !!v; }
@@ -113,4 +114,4 @@ export function win(){
   notes.forEach((f,i)=>{ tone({type:'square', from:f*2, dur:0.08, gain:0.03, t0:i*0.14}); });
 }
 
-export default { unlock, toggleMute, isMuted, setMuted, deal, flip, pickup, place, foundation, invalid, shuffle, win };
+export default { unlock, context, toggleMute, isMuted, setMuted, deal, flip, pickup, place, foundation, invalid, shuffle, win };
