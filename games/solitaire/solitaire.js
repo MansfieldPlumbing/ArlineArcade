@@ -188,7 +188,7 @@ function layout(instant){
   const colX = c => pad + c*(CW+gap);
   const topY = pad;
   const tabY = pad + CH + Math.round(gap*1.6);
-  const dyDown = Math.round(CH*0.17), dyUp = Math.round(CH*0.30);
+  const dyDown = Math.round(CH*0.17), dyUp = Math.round(CH*0.36);   // fan reveals the full big index
   geo = {gap, CW, CH, topY, tabY, colX};
 
   setSlot('stock', colX(0), topY); setSlot('waste', colX(1), topY);
@@ -220,7 +220,8 @@ function face(e,card){
   }
 }
 function faceHTML(card){
-  return `<img class="cf" draggable="false" alt="" src="${DECK_PATH}${SUIT_NAME[card.suit]}_${card.rank}.png">`;
+  const r=RANKS[card.rank], s=SUITS[card.suit].ch;
+  return `<span class="ix tl"><b>${r}</b><i>${s}</i></span><span class="big">${s}</span><span class="ix br"><b>${r}</b><i>${s}</i></span>`;
 }
 
 /* ---- win ----------------------------------------------------------------- */

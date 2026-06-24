@@ -37,8 +37,16 @@
   will-change:transform; user-select:none; -webkit-user-select:none; font-family:var(--display);
 }
 .board.no-anim .card{ transition:none }
-.card.up{ background:#fff }
-.card img.cf{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; border-radius:inherit; pointer-events:none }
+.card.up{ background:linear-gradient(168deg,#fffdf8,#f0ebe0) }
+.card .ix{ position:absolute; display:flex; align-items:center; gap:calc(var(--cw,64px)*.01); line-height:1; font-family:var(--display); font-weight:800 }
+.card .ix.tl{ top:7%; left:8% }
+.card .ix.br{ bottom:7%; right:8%; transform:rotate(180deg) }
+.card .ix b{ font-size:calc(var(--cw,64px)*.48); letter-spacing:-.04em }
+.card .ix i, .card .big{ font-family:"Segoe UI Symbol","Noto Sans Symbols2","Noto Sans Symbols","DejaVu Sans",sans-serif; font-style:normal }
+.card .ix i{ font-size:calc(var(--cw,64px)*.42) }
+.card .big{ position:absolute; left:50%; top:53%; transform:translate(-50%,-50%); font-size:calc(var(--cw,64px)*.98); opacity:.13 }
+.card.red .ix, .card.red .big{ color:#c8102e }
+.card.up:not(.red) .ix, .card.up:not(.red) .big{ color:#16181f }
 .card.dragging{ transition:none !important; cursor:grabbing; box-shadow:0 12px 28px rgba(0,0,0,.55) }
 .card.red{ color:var(--red) }
 .card.down{
