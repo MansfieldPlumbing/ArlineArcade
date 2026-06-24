@@ -8,12 +8,12 @@ import sfx from '../../assets/js/sfx.js';
 
 const COLORS = ['red','yellow','green','blue'];
 const NAMES  = ['You','Rosa','Hank','Lou'];
-const NP = 4;
+let NP = 4;   // chosen on the setup screen (2–4 players)
 
 const el = document.getElementById('uno');
 
 let deck=[], discard=[], hands=[[],[],[],[]];
-let current=0, dir=1, color=null, over=false, drew=false, busy=false, winner=-1, anim=null;
+let current=0, dir=1, color=null, over=false, drew=false, busy=false, winner=-1, anim=null, started=false;
 let picker=null;   // pending wild-color callback
 
 const top = ()=> discard[discard.length-1];
@@ -35,7 +35,7 @@ function draw(n){ const out=[]; for(let k=0;k<n;k++){ reshuffle(); if(deck.lengt
 
 function deal(){
   deck=shuffle(buildDeck());
-  hands=[[],[],[],[]];
+  hands=Array.from({length:NP},()=>[]);
   for(let k=0;k<7;k++) for(let p=0;p<NP;p++) hands[p].push(deck.pop());
   let first;                                  // start on a plain number card
   do { first=deck.pop(); if(first.type!=='number') deck.unshift(first); } while(first.type!=='number');
@@ -70,7 +70,7 @@ function doPlay(p, idx, from){
   if(hands[p].length===0){ winner=p; over=true; busy=false; if(p===0) sfx.win(); render(); return; }
 
   let skip=false;
-  if(card.type==='reverse') dir=-dir;
+  if(card.type==='reverse'){ dir=-dir; if(NP===2) skip=true; }   // 2-player reverse acts as a skip
   if(card.type==='skip') skip=true;
   if(card.type==='draw2'){ hands[step(p,1)].push(...draw(2)); skip=true; }
   if(card.type==='wild4'){ hands[step(p,1)].push(...draw(4)); skip=true; }
@@ -159,7 +159,12 @@ function cardBack(){ return `<div class="uno-card back"><span class="pip">UNO</s
 
 function render(){
   if(!el) return;
-  const opps = [1,2,3].map(p=>`
+  if(!started){
+    el.innerHTML = setupOverlay();
+    el.querySelectorAll('.np-btn').forEach(b=> b.addEventListener('click', ()=>{ NP=+b.dataset.np; newGame(); }));
+    return;
+  }
+  const opps = Array.from({length:NP-1}, (_,i)=>i+1).map(p=>`
     <div class="opp ${current===p&&!over?'active':''}" data-p="${p}">
       <div class="stack">${cardBack()}<span class="count">${hands[p].length}</span></div>
       <div class="oname">${NAMES[p]}</div>
@@ -187,7 +192,7 @@ function render(){
   const handEl=el.querySelector('#hand');
   handEl && handEl.addEventListener('click', e=>{ const b=e.target.closest('.card-btn'); if(b) humanPlay(+b.dataset.idx); });
   bind('#drawBtn','click',humanDraw); bind('#drawPile','click',humanDraw); bind('#passBtn','click',humanPass);
-  if(over) bind('#again','click', ()=>{ deal(); render(); });
+  if(over){ bind('#again','click', newGame); bind('#changeNp','click', ()=>{ started=false; over=false; render(); }); }
   if(picker) el.querySelectorAll('.pick').forEach(b=> b.addEventListener('click', ()=>{ const cb=picker; picker=null; cb(b.dataset.col); }));
 
   if(anim){
@@ -215,11 +220,23 @@ function pickerOverlay(){
   return `<div class="overlay"><div class="panel"><h3>Pick a color</h3><div class="picks">
     ${COLORS.map(c=>`<button class="pick sc-${c}" data-col="${c}" aria-label="${c}"></button>`).join('')}</div></div></div>`;
 }
+function setupOverlay(){
+  return `<div class="overlay setup"><div class="panel"><div class="big">🎴</div>
+    <h3>Arline Arcade Uno</h3><p class="sub">How many players?</p>
+    <div class="np-picks">
+      <button class="ctl np-btn" data-np="2">2</button>
+      <button class="ctl np-btn" data-np="3">3</button>
+      <button class="ctl np-btn" data-np="4">4</button>
+    </div>
+    <p class="sub small">You vs the computer</p></div></div>`;
+}
+function newGame(){ deal(); started=true; over=false; render(); }
 function winOverlay(){
   return `<div class="overlay"><div class="panel"><div class="big">${winner===0?'🎉':'🃏'}</div>
     <h3>${winner===0?'You win!':NAMES[winner]+' wins'}</h3>
-    <button class="ctl" id="again">Play again</button></div></div>`;
+    <div class="winbtns"><button class="ctl" id="again">Play again</button>
+    <button class="ctl ghost" id="changeNp">Change players</button></div></div></div>`;
 }
 
 /* ---- go ------------------------------------------------------------------ */
-if(el){ deal(); render(); }
+if(el){ started=false; render(); }

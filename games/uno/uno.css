@@ -83,3 +83,9 @@
 .picks{ display:flex; gap:14px; justify-content:center }
 .pick{ width:54px; height:54px; border-radius:50%; border:3px solid rgba(255,255,255,.6); cursor:pointer; transition:transform .14s }
 .pick:hover{ transform:scale(1.12) }
+.sub{ font-family:var(--mono,monospace); font-size:.86rem; color:var(--paper,#fde); margin:.1rem 0 1rem }
+.sub.small{ font-size:.72rem; opacity:.7; margin:1rem 0 0 }
+.np-picks{ display:flex; gap:14px; justify-content:center }
+.np-btn{ width:66px; height:66px; font-size:1.5rem; padding:0; border-radius:16px }
+.winbtns{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap }
+.ctl.ghost{ background:rgba(0,0,0,.28); color:var(--gold-hi,#ffe9a0); box-shadow:inset 0 0 0 1px var(--line,rgba(233,195,74,.34)) }
