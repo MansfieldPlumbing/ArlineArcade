@@ -8,9 +8,13 @@ import sfx from '../../assets/js/sfx.js';
 
 const SUITS = [{ch:'♠',color:'black'},{ch:'♥',color:'red'},{ch:'♦',color:'red'},{ch:'♣',color:'black'}];
 const RANKS = ['','A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+const SUIT_NAME = ['spade','heart','diamond','club'];      // matches assets/cards/rawpixel/<suit>_<rank>.png
+const DECK_PATH = '../../assets/cards/rawpixel/';
+const ASPECT = 1.5;                                        // taller cards, better use of phone height
 
 const board = document.getElementById('board');
 let cards, stock, waste, foundations, tableau, elMap, slotEl, zc=1, moves=0, won=false;
+const posMap = new Map(); let geo=null, drag=null;
 
 const topOf = a => a[a.length-1];
 
@@ -37,7 +41,7 @@ function deal(){
   elMap=new Map();
   for(const card of cards){
     const e=document.createElement('div'); e.className='card down'; e._s='d'; e.dataset.id=card.id;
-    e.addEventListener('click', ()=>onClick(card));
+    e.addEventListener('pointerdown', ev=>onPointerDown(ev, card));
     board.appendChild(e); elMap.set(card.id,e);
   }
   slotEl.stock.addEventListener('click', drawStock);
@@ -129,6 +133,49 @@ function autoStep(){
 function checkWin(){ if(foundations.every(f=>f.length===13)){ won=true; sfx.win(); showWin(); } }
 function wiggle(card){ const e=elMap.get(card.id); if(e){ e.classList.add('shake'); setTimeout(()=>e.classList.remove('shake'),320); } sfx.invalid(); }
 
+/* ---- pointer: tap OR drag (both work) ------------------------------------ */
+function onPointerDown(ev, card){
+  if(won) return;
+  const loc=locate(card); if(!loc) return;
+  drag={card, loc, sx:ev.clientX, sy:ev.clientY, moved:false, run:null, base:null};
+  if((loc.type==='waste' && card===topOf(waste)) || (loc.type==='tableau' && card.up)){
+    let run = loc.type==='waste' ? [card] : tableau[loc.col].slice(loc.idx);
+    if(loc.type==='tableau' && !runValid(run)) run=null;
+    if(run){ drag.run=run; drag.base=run.map(c=>({...posMap.get(c.id)})); }
+  }
+  addEventListener('pointermove', onPointerMove);
+  addEventListener('pointerup', onPointerUp, {once:true});
+  addEventListener('pointercancel', onPointerUp, {once:true});
+}
+function onPointerMove(ev){
+  if(!drag) return;
+  const dx=ev.clientX-drag.sx, dy=ev.clientY-drag.sy;
+  if(!drag.moved && Math.hypot(dx,dy)>7) drag.moved=true;
+  if(drag.moved && drag.run) drag.run.forEach((c,i)=>{
+    const e=elMap.get(c.id); e.classList.add('dragging'); e.style.zIndex=3000+i;
+    e.style.transform=`translate(${drag.base[i].x+dx}px,${drag.base[i].y+dy}px)`;
+  });
+}
+function onPointerUp(ev){
+  removeEventListener('pointermove', onPointerMove);
+  const d=drag; drag=null; if(!d) return;
+  if(d.run) d.run.forEach(c=> elMap.get(c.id).classList.remove('dragging'));
+  if(!d.moved){ if(d.loc.type==='stock') drawStock(); else onClick(d.card); return; }   // a tap
+  if(!d.run){ layout(false); return; }
+  const hit=hitTest(ev.clientX, ev.clientY);                                            // a drag-drop
+  if(hit && hit.type==='foundation' && d.run.length===1 && foundationFor(d.card)>=0){ doFoundation(d.card, d.loc); return; }
+  if(hit && hit.type==='tableau' && !(d.loc.type==='tableau' && hit.col===d.loc.col) && canTableau(d.run[0], hit.col)){ doTableau(d.run, d.loc, hit.col); return; }
+  layout(false);   // illegal drop → slide back
+}
+function hitTest(cx, cy){
+  if(!geo) return null;
+  const r=board.getBoundingClientRect(); const x=cx-r.left, y=cy-r.top;
+  const {gap,CW,CH,topY,tabY,colX}=geo;
+  if(y>=topY-CH*0.4 && y<=topY+CH*1.2) for(let f=0;f<4;f++){ const fx=colX(3+f); if(x>=fx-gap && x<=fx+CW+gap) return {type:'foundation',idx:f}; }
+  if(y>=tabY-CH*0.4) for(let c=0;c<7;c++){ const cx2=colX(c); if(x>=cx2-gap && x<=cx2+CW+gap) return {type:'tableau',col:c}; }
+  return null;
+}
+
 /* ---- layout (positions everything; transforms animate) ------------------- */
 function layout(instant){
   if(instant) board.classList.add('no-anim');
@@ -136,12 +183,13 @@ function layout(instant){
   const pad = Math.max(6, Math.round(W*0.012));
   const gap = Math.max(4, Math.round(W*0.012));
   const CW = Math.max(38, Math.min(96, Math.floor((W - 2*pad - 6*gap) / 7)));
-  const CH = Math.round(CW*1.4);
-  board.style.setProperty('--cw', CW+'px');
+  const CH = Math.round(CW*ASPECT);
+  board.style.setProperty('--cw', CW+'px'); board.style.setProperty('--ch', CH+'px');
   const colX = c => pad + c*(CW+gap);
   const topY = pad;
   const tabY = pad + CH + Math.round(gap*1.6);
   const dyDown = Math.round(CH*0.17), dyUp = Math.round(CH*0.30);
+  geo = {gap, CW, CH, topY, tabY, colX};
 
   setSlot('stock', colX(0), topY); setSlot('waste', colX(1), topY);
   for(let f=0;f<4;f++) setSlot('f'+f, colX(3+f), topY);
@@ -161,7 +209,7 @@ function layout(instant){
   if(instant){ void board.offsetWidth; board.classList.remove('no-anim'); }
 }
 function setSlot(name,x,y){ const e=slotEl[name]; if(e) e.style.transform=`translate(${x}px,${y}px)`; }
-function put(card,x,y,zi){ const e=elMap.get(card.id); e.style.transform=`translate(${x}px,${y}px)`; e.style.zIndex=zi+1; face(e,card); }
+function put(card,x,y,zi){ const e=elMap.get(card.id); e.style.transform=`translate(${x}px,${y}px)`; e.style.zIndex=zi+1; posMap.set(card.id,{x,y}); face(e,card); }
 function face(e,card){
   if(card.up){
     if(e._s!=='u'){ e.classList.remove('down'); e.classList.add('up'); e._s='u'; }
@@ -172,8 +220,7 @@ function face(e,card){
   }
 }
 function faceHTML(card){
-  const r=RANKS[card.rank], s=SUITS[card.suit].ch;
-  return `<span class="corner tl"><b>${r}</b><i>${s}</i></span><span class="pip">${s}</span><span class="corner br"><b>${r}</b><i>${s}</i></span>`;
+  return `<img class="cf" draggable="false" alt="" src="${DECK_PATH}${SUIT_NAME[card.suit]}_${card.rank}.png">`;
 }
 
 /* ---- win ----------------------------------------------------------------- */
