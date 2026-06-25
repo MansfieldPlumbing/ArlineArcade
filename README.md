@@ -9,12 +9,13 @@ No ads, no sign-ups, no tracking. Just open it and play.
 
 | Game | Status | Notes |
 |------|--------|-------|
-| ♠ Solitaire (Klondike) | 🚧 Coming soon | Drag-and-drop, auto-complete |
-| ♥ Uno | 🚧 Coming soon | Vs. a friendly computer player |
+| ♠ Solitaire (Klondike) | ✅ Playable | Tap-to-move + drag-and-drop, auto-finish, gold deck |
+| ♥ Uno | ✅ Playable | 2–4 players vs. friendly computer opponents |
 | ♦ Minesweeper | ✅ Playable | Self-contained applet |
 | ♣ Painter | ✅ Playable | "flickpaint" — layered canvas |
+| 🎲 Craps | 🚧 Planned | 3D dice on the felt — see [`ROADMAP.md`](ROADMAP.md) |
 
-More games on the way.
+More games on the way — the plan lives in [`ROADMAP.md`](ROADMAP.md).
 
 ## How it's built
 
@@ -59,3 +60,7 @@ dark palette, warm-gold accent, Selawik display type, responsive card grid.
 - **Fonts** — Cascadia Code (Nerd Font) and Selawik, both open-source from Microsoft.
 - **Painter** — the `flickpaint` canvas app, brought over and made standalone.
 - **Minesweeper** — a self-contained HTML applet.
+- **Playing cards** — number faces, gold frame, and the filigree back are original to
+  this repo. The J/Q/K court figures are Byron Knoll's vector deck (**public domain**,
+  via [`notpeter/Vector-Playing-Cards`](https://github.com/notpeter/Vector-Playing-Cards)).
+  Regenerate the deck with `python3 tools/gen_deck.py` (see [`tools/`](tools/)).
