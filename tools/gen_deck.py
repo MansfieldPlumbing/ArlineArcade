@@ -109,7 +109,9 @@ if __name__=='__main__':
         for rank in range(1,14):
             im = court_card(rank,sl) if rank>=11 else number_card(rank,c,fn)
             im.convert('RGBA').save(f'{OUT}/{name}_{rank}.png'); allc.append(im)
-    back().convert('RGBA').save(f'{OUT}/back.png')
+    # NOTE: the shipped card back is back.jpg — a blue Bicycle Rider Back (1880s engraving,
+    # public domain) traced/colored by the user, sourced from tools/cardback/. We no longer
+    # generate a back here; keep back() above only as a fallback if you want a procedural one.
     cw=88; ch=int(cw*1.5); sheet=Image.new('RGB',(cw*13+20,ch*4+20),(11,92,61))
     for i,im in enumerate(allc): sheet.paste(im.convert('RGB').resize((cw,ch)),(10+(i%13)*cw,10+(i//13)*ch))
     sheet.save(sys.argv[1] if len(sys.argv)>1 else '/tmp/deck.png'); print("deck regenerated ->",OUT)
