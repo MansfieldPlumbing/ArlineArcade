@@ -12,7 +12,9 @@ if ('serviceWorker' in navigator) {
         if (nw.state === 'installed' && navigator.serviceWorker.controller) location.reload();
       });
     });
-    // check for a new deploy whenever the app regains focus
+    // check for a new deploy: right now, whenever focus returns, and every 30 min
+    reg.update().catch(() => {});
     document.addEventListener('visibilitychange', () => { if (!document.hidden) reg.update().catch(() => {}); });
+    setInterval(() => reg.update().catch(() => {}), 30 * 60 * 1000);
   }).catch(() => {});
 }
