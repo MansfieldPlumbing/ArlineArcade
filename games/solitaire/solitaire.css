@@ -37,7 +37,8 @@
   will-change:transform; user-select:none; -webkit-user-select:none; font-family:var(--display);
 }
 .board.no-anim .card{ transition:none }
-.card.up{ background:linear-gradient(168deg,#fffdf8,#f0ebe0) }
+.card.up{ background:#fff }
+.card img.cf{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; border-radius:inherit; pointer-events:none }
 .card .ix{ position:absolute; display:flex; align-items:center; gap:calc(var(--cw,64px)*.01); line-height:1; font-family:var(--display); font-weight:800 }
 .card .ix.tl{ top:7%; left:8% }
 .card .ix.br{ bottom:7%; right:8%; transform:rotate(180deg) }
@@ -50,15 +51,10 @@
 .card.dragging{ transition:none !important; cursor:grabbing; box-shadow:0 12px 28px rgba(0,0,0,.55) }
 .card.red{ color:var(--red) }
 .card.down{
-  background:linear-gradient(155deg,#1a2c49,#0b1830); border:1px solid rgba(233,195,74,.4);
-  box-shadow:0 1px 2px rgba(0,0,0,.4), 0 5px 12px rgba(0,0,0,.3);
+  background-image:url(../../assets/cards/royal/back.png); background-size:cover; background-position:center;
+  border:none; box-shadow:0 1px 2px rgba(0,0,0,.4), 0 5px 12px rgba(0,0,0,.3);
 }
-.card.down::after{
-  content:""; position:absolute; inset:0;
-  background:
-    repeating-linear-gradient(45deg, rgba(233,195,74,.16) 0 5px, transparent 5px 11px),
-    radial-gradient(circle at 50% 50%, rgba(233,195,74,.28), transparent 62%);
-}
+.card.down::after{ content:none }
 .card .corner{ position:absolute; left:7%; top:3.5%; display:flex; flex-direction:column; align-items:center; line-height:.92; font-weight:800 }
 .card .corner b{ font-size:calc(var(--cw,64px)*.34) }
 .card .corner i{ font-size:calc(var(--cw,64px)*.26); font-style:normal; margin-top:1px }

@@ -9,7 +9,7 @@ import sfx from '../../assets/js/sfx.js';
 const SUITS = [{ch:'♠',color:'black'},{ch:'♥',color:'red'},{ch:'♦',color:'red'},{ch:'♣',color:'black'}];
 const RANKS = ['','A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 const SUIT_NAME = ['spade','heart','diamond','club'];      // matches assets/cards/rawpixel/<suit>_<rank>.png
-const DECK_PATH = '../../assets/cards/rawpixel/';
+const DECK_PATH = '../../assets/cards/royal/';
 const ASPECT = 1.5;                                        // taller cards, better use of phone height
 
 const board = document.getElementById('board');
@@ -220,8 +220,7 @@ function face(e,card){
   }
 }
 function faceHTML(card){
-  const r=RANKS[card.rank], s=SUITS[card.suit].ch;
-  return `<span class="ix tl"><b>${r}</b><i>${s}</i></span><span class="big">${s}</span><span class="ix br"><b>${r}</b><i>${s}</i></span>`;
+  return `<img class="cf" draggable="false" alt="" src="${DECK_PATH}${SUIT_NAME[card.suit]}_${card.rank}.png">`;
 }
 
 /* ---- win ----------------------------------------------------------------- */
