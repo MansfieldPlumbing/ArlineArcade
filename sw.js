@@ -2,7 +2,7 @@
    Network-first for app code (HTML/JS/CSS) so you ALWAYS get the latest after a
    deploy — no more manual cache-clearing. Cache-first for static art (cards,
    images, fonts) for speed. Falls back to cache when offline. */
-const VERSION = 'arline-v3';
+const VERSION = 'arline-v4';
 const FALLBACK = './index.html';
 
 self.addEventListener('install', () => { self.skipWaiting(); });
