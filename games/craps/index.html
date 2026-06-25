@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Craps — Arline Arcade</title>
+<meta name="description" content="Roll the bones — big 3D Vegas dice on the green felt. Ad-free.">
+<meta name="theme-color" content="#0b6b40">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../styles/app.css">
+<link rel="stylesheet" href="craps.css">
+</head>
+<body>
+<nav class="topbar">
+  <a class="back" href="../../">&#8592; Arcade</a>
+  <img class="topbar-logo" src="../../assets/arlinearcade-logo.png" alt="Arline Arcade">
+  <span class="crumb">Craps</span>
+</nav>
+
+<main id="table" class="felt">
+  <div class="puck-row">
+    <span id="puck" class="puck off">OFF</span>
+    <span id="status" class="status">Come-out roll &mdash; tap to roll the dice</span>
+  </div>
+
+  <div id="pit" class="pit">
+    <div class="die-col">
+      <div class="lift" id="lift0"><div class="die" id="die0"></div></div>
+      <div class="shadow" id="sh0"></div>
+    </div>
+    <div class="die-col">
+      <div class="lift" id="lift1"><div class="die" id="die1"></div></div>
+      <div class="shadow" id="sh1"></div>
+    </div>
+  </div>
+
+  <div class="readout">
+    <span id="total" class="total">&mdash;</span>
+    <span id="hint" class="hint">7 or 11 wins &middot; 2, 3, 12 craps</span>
+  </div>
+
+  <button id="rollBtn" class="roll-btn" type="button">Roll the dice</button>
+</main>
+
+<button id="musicToggle" class="music-toggle" type="button" aria-label="Toggle music">&#9834;</button>
+
+<script type="module" src="../../assets/js/music.js"></script>
+<script type="module" src="craps.js"></script>
+<script type="module" src="../../assets/js/sw-register.js"></script>
+</body>
+</html>
