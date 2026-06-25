@@ -58,14 +58,17 @@ the green felt**, then settle to show the roll.
 
 ### Build checklist
 
-- [ ] `games/craps/` scaffold (page + felt table + chrome that matches the arcade)
-- [ ] 3D dice component: cube, pip faces, tumble + bounce + contact shadow
-- [ ] Deterministic "land on value" + a real roll button
-- [ ] Rules engine in vanilla JS (come-out / point / seven-out)
+- [x] `games/craps/` scaffold (page + felt table + chrome that matches the arcade)
+- [x] 3D dice component: cube, pip faces, tumble + bounce + contact shadow
+- [x] Deterministic "land on value" + a real roll button (tap anywhere to roll)
+- [x] Rules flow: come-out / point / seven-out with the ON/OFF puck and live status
 - [ ] Bet layout + payouts for the v1 bet set
 - [ ] Chip stack / bankroll + win/lose feedback
-- [ ] **Verify** the rules engine with a Node simulation (like Uno & Solitaire)
-- [ ] Gaudy Luxor reskin pass; add the tile to the home grid when it's truly playable
+- [ ] **Verify** the bet-resolution with a Node simulation (like Uno & Solitaire)
+- [ ] Gaudier Luxor reskin pass (tile is already on the home grid)
+
+**Live now:** the dice + come-out/point flow are deployed — tap *Craps* on the home grid.
+Betting is the next slice.
 
 ---
 
