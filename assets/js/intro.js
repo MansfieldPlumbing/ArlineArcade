@@ -22,6 +22,9 @@ const force = /[?&]intro(=|&|$)/.test(location.search) || location.hash === '#in
 const replayBtn = document.getElementById('introReplay');
 if(replayBtn) replayBtn.addEventListener('click', ()=>{ sessionStorage.removeItem(SEEN_KEY); location.reload(); });
 
+const SUITS = [['♠',false],['♥',true],['♦',true],['♣',false]];
+const RANKS = ['A','K','Q','J','10','7'];
+
 if(!intro){ /* not the home page */ }
 else if(!force && sessionStorage.getItem(SEEN_KEY)){ removeIntro(true); }
 else { start(); }
@@ -33,9 +36,6 @@ function removeIntro(instant){
   intro.classList.add('gone');
   setTimeout(()=>{ intro.remove(); document.body.classList.remove('intro-lock'); }, 650);
 }
-
-const SUITS = [['♠',false],['♥',true],['♦',true],['♣',false]];
-const RANKS = ['A','K','Q','J','10','7'];
 
 function start(){
   document.body.classList.add('intro-lock');
