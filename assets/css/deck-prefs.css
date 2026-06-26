@@ -1,0 +1,33 @@
+/* Deck settings panel (opened by the gear). Path-independent UI only — the actual
+   card-back images are wired per game (e.g. solitaire.css) via html[data-back="…"]. */
+.ds-overlay{
+  position:fixed; inset:0; z-index:1000; padding:20px;
+  background:rgba(0,0,0,.55); display:grid; place-items:center;
+  -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px);
+}
+.ds-panel{
+  position:relative; width:min(440px,92vw); max-height:86vh; overflow:auto;
+  background:#0e3a28; color:#f3efe2;
+  border:1px solid rgba(233,195,74,.45); border-radius:16px;
+  padding:22px 22px 26px; box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.ds-panel h2{ margin:.1rem 0 1rem; font-size:1.05rem; letter-spacing:.02em; color:#ecd9a0; }
+.ds-close{
+  position:absolute; top:8px; right:12px; background:none; border:none;
+  color:#f3efe2; font-size:1.7rem; line-height:1; cursor:pointer; opacity:.8;
+}
+.ds-close:hover{ opacity:1; }
+.ds-swatches{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.ds-swatch{
+  background:none; border:2px solid transparent; border-radius:12px;
+  padding:6px 6px 8px; cursor:pointer; color:#e7e0cf; font:inherit;
+}
+.ds-swatch img{
+  width:100%; aspect-ratio:2/3; object-fit:cover; border-radius:8px; display:block;
+  box-shadow:0 2px 6px rgba(0,0,0,.4);
+}
+.ds-swatch span{ display:block; margin-top:6px; font-size:.82rem; opacity:.9; }
+.ds-swatch:hover{ border-color:rgba(233,195,74,.5); }
+.ds-swatch.sel{ border-color:#e9c34a; }
+.ds-swatch.sel span{ color:#ecd9a0; font-weight:600; }
+.settings-gear{ margin-left:auto; font-size:1.15rem; line-height:1; }

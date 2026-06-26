@@ -9,6 +9,7 @@
 <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../../styles/app.css">
 <link rel="stylesheet" href="solitaire.css">
+<link rel="stylesheet" href="../../assets/css/deck-prefs.css">
 </head>
 <body>
 <nav class="topbar">
@@ -21,6 +22,7 @@
   <button id="newGame" class="btn">New game</button>
   <button id="autoBtn" class="btn ghost">Auto-finish</button>
   <span class="moves" id="moves">0 moves</span>
+  <button class="btn ghost settings-gear" data-settings type="button" aria-label="Settings">&#9881;</button>
 </div>
 
 <div id="board" class="board"></div>
@@ -36,6 +38,7 @@
 
 <button id="musicToggle" class="music-toggle" type="button" aria-label="Toggle music">&#9834;</button>
 
+<script src="../../assets/js/deck-prefs.js"></script>
 <script type="module" src="../../assets/js/music.js"></script>
 <script type="module" src="solitaire.js"></script>
 <script type="module" src="../../assets/js/sw-register.js"></script>

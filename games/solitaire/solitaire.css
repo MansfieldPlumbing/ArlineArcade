@@ -55,6 +55,12 @@
   border:none; box-shadow:0 1px 2px rgba(0,0,0,.4), 0 5px 12px rgba(0,0,0,.3);
 }
 .card.down::after{ content:none }
+/* selectable back colours (default blue = back.jpg above) */
+html[data-back="red"]      .card.down{ background-image:url(../../assets/cards/royal/back-red.jpg) }
+html[data-back="green"]    .card.down{ background-image:url(../../assets/cards/royal/back-green.jpg) }
+html[data-back="purple"]   .card.down{ background-image:url(../../assets/cards/royal/back-purple.jpg) }
+html[data-back="charcoal"] .card.down{ background-image:url(../../assets/cards/royal/back-charcoal.jpg) }
+html[data-back="burgundy"] .card.down{ background-image:url(../../assets/cards/royal/back-burgundy.jpg) }
 .card .corner{ position:absolute; left:7%; top:3.5%; display:flex; flex-direction:column; align-items:center; line-height:.92; font-weight:800 }
 .card .corner b{ font-size:calc(var(--cw,64px)*.34) }
 .card .corner i{ font-size:calc(var(--cw,64px)*.26); font-style:normal; margin-top:1px }
