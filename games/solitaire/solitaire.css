@@ -38,7 +38,8 @@
 }
 .board.no-anim .card{ transition:none }
 .card.up{ background:#fff }
-.card img.cf{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; border-radius:inherit; pointer-events:none }
+.card .cf{ position:absolute; inset:0; width:100%; height:100%; display:block; border-radius:inherit; pointer-events:none }
+.card img.cf{ object-fit:cover }   /* court figures fill; inline-SVG number cards use their own preserveAspectRatio */
 .card .ix{ position:absolute; display:flex; align-items:center; gap:calc(var(--cw,64px)*.01); line-height:1; font-family:var(--display); font-weight:800 }
 .card .ix.tl{ top:7%; left:8% }
 .card .ix.br{ bottom:7%; right:8%; transform:rotate(180deg) }

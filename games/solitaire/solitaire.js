@@ -5,6 +5,7 @@
    CSS-drawn cards for now; the LGPL Svg-cards-2.0.svg deck is an easy art swap.
    ============================================================================ */
 import sfx from '../../assets/js/sfx.js';
+import { FACE_SVG } from '../../assets/js/deck-faces.js';   // A-10 composed as inline SVG; courts stay images
 
 const SUITS = [{ch:'♠',color:'black'},{ch:'♥',color:'red'},{ch:'♦',color:'red'},{ch:'♣',color:'black'}];
 const RANKS = ['','A','2','3','4','5','6','7','8','9','10','J','Q','K'];
@@ -220,7 +221,9 @@ function face(e,card){
   }
 }
 function faceHTML(card){
-  return `<img class="cf" draggable="false" alt="" src="${DECK_PATH}${SUIT_NAME[card.suit]}_${card.rank}.png">`;
+  const suit = SUIT_NAME[card.suit];
+  if(card.rank <= 10){ const svg = FACE_SVG[`${suit}_${card.rank}`]; if(svg) return svg; }   // composed number card
+  return `<img class="cf" draggable="false" alt="" src="${DECK_PATH}${suit}_${card.rank}.png">`;   // court figure (J/Q/K)
 }
 
 /* ---- win ----------------------------------------------------------------- */
