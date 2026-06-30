@@ -40,7 +40,6 @@
 
 <script src="../../assets/js/deck-prefs.js"></script>
 <script type="module">
-  import { FACE_SVG } from '../../assets/js/deck-faces.js';
   const SUIT_NAME = ['spade','heart','diamond','club'];
   const RED = new Set(['heart','diamond']);
   const LABEL = ['','A','2','3','4','5','6','7','8','9','10','J','Q','K'];
@@ -49,7 +48,6 @@
   const grid = document.getElementById('deckGrid');
 
   function faceHTML(suit, rank){
-    if(rank <= 10){ const svg = FACE_SVG[`${suit}_${rank}`]; if(svg) return svg; }
     return `<img class="cf" draggable="false" alt="" src="${DECK_PATH}${suit}_${rank}.png">`;
   }
   // rows = suits, cols = A..K

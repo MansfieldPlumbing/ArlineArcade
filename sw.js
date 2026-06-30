@@ -11,7 +11,7 @@
    Because the cache name never changes, deploying never wipes the cache. Just edit and
    deploy — clients pick up changed art on their next visit and changed code on their
    next navigation. There is no VERSION to bump and no cache to clear by hand. */
-const CACHE = 'arline-2';          // bumped once to evict a stale deck cached on some phones
+const CACHE = 'arline-3';          // bumped to evict the inline-SVG deck (now PNG faces)
 const FALLBACK = './index.html';
 
 self.addEventListener('install', () => { self.skipWaiting(); });
