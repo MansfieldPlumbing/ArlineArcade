@@ -16,6 +16,12 @@
 }
 
 :root{
+  /* The deck is a fixed felt-green/gold theme — never let phone "dark mode" /
+     force-dark invert it (that's what turned the white SVG number cards black
+     with light glyphs while the PNG courts stayed normal). "only light" opts the
+     whole app out of any UA dark adjustment. */
+  color-scheme: only light;
+
   --felt:#0c6b40;          /* table green        */
   --felt-2:#085030;
   --felt-edge:#04341f;

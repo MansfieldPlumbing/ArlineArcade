@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
 <title>Deck — Arline Arcade</title>
 <meta name="theme-color" content="#0b6b40">
 <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
@@ -11,11 +12,18 @@
 <link rel="stylesheet" href="../../assets/css/deck-prefs.css">
 <style>
   .deck-wrap{ width:100%; max-width:1100px; margin:0 auto; padding:8px clamp(6px,2vw,16px) 40px }
-  .deck-grid{ display:grid; grid-template-columns:repeat(13,1fr); gap:clamp(4px,1.1vw,10px) }
-  .deck-cell{ display:flex; flex-direction:column; align-items:center; gap:4px }
-  .deck-cell .card{ position:relative; left:auto; top:auto; width:var(--cw,62px); height:calc(var(--cw,62px)*1.5);
+  .deck-grid{ display:grid; grid-template-columns:repeat(13,1fr); gap:clamp(2px,1.1vw,10px) }
+  .deck-cell{ display:flex; flex-direction:column; align-items:center; gap:3px; min-width:0 }
+  /* cards fill their column so all 13 always fit the screen width — no horizontal overflow */
+  .deck-cell .card{ position:relative; left:auto; top:auto; width:100%; height:auto; aspect-ratio:2/3;
     transition:none; will-change:auto }
-  .deck-cell small{ font:700 .62rem/1 var(--mono); color:var(--paper); opacity:.55 }
+  .deck-cell small{ font:700 clamp(.42rem,1.5vw,.62rem)/1 var(--mono); color:var(--paper); opacity:.55 }
+  /* portrait phones: keep all four suit rows on one screen, suits stacked A→K */
+  @media (max-width:560px){
+    .deck-wrap{ padding:6px 6px 20px }
+    .deck-grid{ gap:3px 2px }
+    .deck-note{ display:none }
+  }
   .deck-head{ display:flex; align-items:center; justify-content:center; gap:.6rem; flex-wrap:wrap; padding:8px 0 4px }
   .deck-head h1{ font-family:var(--display); font-weight:700; font-size:clamp(1.1rem,4vw,1.7rem);
     background:var(--gold-grad); -webkit-background-clip:text; background-clip:text; color:transparent; margin:0 }
