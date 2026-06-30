@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Deck — Arline Arcade</title>
+<meta name="theme-color" content="#0b6b40">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../styles/app.css">
+<link rel="stylesheet" href="solitaire.css">
+<link rel="stylesheet" href="../../assets/css/deck-prefs.css">
+<style>
+  .deck-wrap{ width:100%; max-width:1100px; margin:0 auto; padding:8px clamp(6px,2vw,16px) 40px }
+  .deck-grid{ display:grid; grid-template-columns:repeat(13,1fr); gap:clamp(4px,1.1vw,10px) }
+  .deck-cell{ display:flex; flex-direction:column; align-items:center; gap:4px }
+  .deck-cell .card{ position:relative; left:auto; top:auto; width:var(--cw,62px); height:calc(var(--cw,62px)*1.5);
+    transition:none; will-change:auto }
+  .deck-cell small{ font:700 .62rem/1 var(--mono); color:var(--paper); opacity:.55 }
+  .deck-head{ display:flex; align-items:center; justify-content:center; gap:.6rem; flex-wrap:wrap; padding:8px 0 4px }
+  .deck-head h1{ font-family:var(--display); font-weight:700; font-size:clamp(1.1rem,4vw,1.7rem);
+    background:var(--gold-grad); -webkit-background-clip:text; background-clip:text; color:transparent; margin:0 }
+  .deck-note{ text-align:center; font:600 .72rem/1.4 var(--mono); color:var(--paper); opacity:.6; margin:2px auto 12px; max-width:640px }
+</style>
+</head>
+<body>
+<nav class="topbar">
+  <a class="back" href="./">&#8592; Solitaire</a>
+  <img class="topbar-logo" src="../../assets/arlinearcade-logo.png" alt="Arline Arcade">
+  <span class="crumb">Deck</span>
+</nav>
+
+<div class="deck-wrap">
+  <div class="deck-head">
+    <h1>The full deck</h1>
+    <button class="btn ghost settings-gear" data-settings type="button" aria-label="Settings">&#9881;</button>
+  </div>
+  <p class="deck-note">Every card, all four suits. Tap the gear to change the back. Screenshot away.</p>
+  <div id="deckGrid" class="deck-grid"></div>
+</div>
+
+<script src="../../assets/js/deck-prefs.js"></script>
+<script type="module">
+  import { FACE_SVG } from '../../assets/js/deck-faces.js';
+  const SUIT_NAME = ['spade','heart','diamond','club'];
+  const RED = new Set(['heart','diamond']);
+  const LABEL = ['','A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+  const PIP = {spade:'♠', heart:'♥', diamond:'♦', club:'♣'};
+  const DECK_PATH = '../../assets/cards/royal/';
+  const grid = document.getElementById('deckGrid');
+
+  function faceHTML(suit, rank){
+    if(rank <= 10){ const svg = FACE_SVG[`${suit}_${rank}`]; if(svg) return svg; }
+    return `<img class="cf" draggable="false" alt="" src="${DECK_PATH}${suit}_${rank}.png">`;
+  }
+  // rows = suits, cols = A..K
+  for(const suit of SUIT_NAME){
+    for(let rank=1; rank<=13; rank++){
+      const cell = document.createElement('div'); cell.className='deck-cell';
+      const card = document.createElement('div');
+      card.className = 'card up' + (RED.has(suit) ? ' red' : '');
+      card.innerHTML = faceHTML(suit, rank);
+      cell.appendChild(card);
+      const tag = document.createElement('small');
+      tag.textContent = LABEL[rank] + PIP[suit];
+      cell.appendChild(tag);
+      grid.appendChild(cell);
+    }
+  }
+  // sizing: fit 13 across
+  const fit = ()=>{
+    const w = grid.clientWidth || 900;
+    const gap = Math.max(4, Math.min(10, w*0.011));
+    const cw = Math.max(34, Math.floor((w - gap*12) / 13));
+    grid.style.setProperty('--cw', cw+'px');
+  };
+  fit(); addEventListener('resize', fit);
+</script>
+<script type="module" src="../../assets/js/sw-register.js"></script>
+</body>
+</html>

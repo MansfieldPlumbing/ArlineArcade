@@ -40,6 +40,7 @@
               '<span>' + b.label + '</span></button>';
           }).join('') +
         '</div>' +
+        '<a class="ds-link" href="cards.html">See all cards &rsaquo;</a>' +
       '</div>';
     function close() { ov.remove(); document.removeEventListener('keydown', onKey); }
     function onKey(e) { if (e.key === 'Escape') close(); }

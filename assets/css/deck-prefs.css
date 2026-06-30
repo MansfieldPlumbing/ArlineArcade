@@ -31,3 +31,8 @@
 .ds-swatch.sel{ border-color:#e9c34a; }
 .ds-swatch.sel span{ color:#ecd9a0; font-weight:600; }
 .settings-gear{ margin-left:auto; font-size:1.15rem; line-height:1; }
+.ds-link{
+  display:inline-block; margin-top:18px; font:600 .9rem/1 inherit;
+  color:#ecd9a0; text-decoration:none; opacity:.92;
+}
+.ds-link:hover{ opacity:1; text-decoration:underline; }
