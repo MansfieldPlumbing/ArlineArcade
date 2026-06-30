@@ -2,6 +2,24 @@
    theme from app.css. Cards are absolutely positioned; moving = changing a
    transform, so the CSS transition slides them. */
 
+/* ---- load screen (covers the board until the deck art is ready) ---- */
+.sol-load{
+  position:fixed; inset:0; z-index:1200; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:18px;
+  background:radial-gradient(circle at 50% 38%, #0c6b41, #053620 78%);
+  transition:opacity .45s ease; opacity:1;
+}
+.sol-load.gone{ opacity:0; pointer-events:none }
+.sol-load-logo{ width:min(58vw,260px); height:auto; filter:drop-shadow(0 6px 18px rgba(0,0,0,.5)) }
+.sol-load-spinner{
+  width:46px; height:46px; border-radius:50%;
+  border:4px solid rgba(233,195,74,.25); border-top-color:#e9c34a;
+  animation:solSpin .8s linear infinite;
+}
+.sol-load-text{ font-family:var(--mono,monospace); font-size:.86rem; letter-spacing:.06em; color:#ecd9a0; opacity:.9 }
+@keyframes solSpin{ to{ transform:rotate(360deg) } }
+@media (prefers-reduced-motion:reduce){ .sol-load-spinner{ animation:none } }
+
 .sol-bar{
   display:flex; align-items:center; justify-content:center; gap:.6rem; flex-wrap:wrap;
   width:100%; max-width:900px; margin:0 auto; padding:6px clamp(8px,3vw,18px) 2px;
