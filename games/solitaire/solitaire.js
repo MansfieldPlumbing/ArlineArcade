@@ -238,6 +238,23 @@ function confetti(){
 }
 function updateBar(){ const m=document.getElementById('moves'); if(m) m.textContent = moves + (moves===1?' move':' moves'); }
 
+/* ---- load screen --------------------------------------------------------- */
+// Court figures are <img>; preload them (and the chosen back) so the board never
+// flashes a half-loaded card. The composed number cards are inline SVG and need no
+// loading. Resolve on load OR error so a single missing file can't strand the user.
+function preloadDeck(){
+  const urls = [];
+  for(const s of SUIT_NAME) for(const r of [11,12,13]) urls.push(`${DECK_PATH}${s}_${r}.png`);
+  urls.push(`${DECK_PATH}back.jpg`);
+  const back = document.documentElement.dataset.back;
+  if(back && back !== 'blue') urls.push(`${DECK_PATH}back-${back}.jpg`);
+  return Promise.all(urls.map(u => new Promise(res => { const im = new Image(); im.onload = im.onerror = res; im.src = u; })));
+}
+function hideLoader(){
+  const el = document.getElementById('solLoad');
+  if(el && !el.classList.contains('gone')){ el.classList.add('gone'); setTimeout(() => el.remove(), 600); }
+}
+
 /* ---- go ------------------------------------------------------------------ */
 if(board){
   document.getElementById('newGame')?.addEventListener('click', deal);
@@ -245,4 +262,5 @@ if(board){
   document.getElementById('winNew')?.addEventListener('click', ()=>{ hideWin(); deal(); });
   let rt; addEventListener('resize', ()=>{ clearTimeout(rt); rt=setTimeout(()=>layout(true), 120); });
   deal();
+  Promise.race([ preloadDeck(), new Promise(r => setTimeout(r, 3500)) ]).then(hideLoader);
 }
