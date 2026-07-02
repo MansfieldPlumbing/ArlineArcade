@@ -39,11 +39,14 @@ function check(name, ok, detail = ''){
 const RR = C.BALL_R + C.RIM_R;
 const IRONS = [C.RIM_D - C.RIM_HALF, C.RIM_D + C.RIM_HALF];
 
-/** Assert rim integrity for every ball at an observed step:
-    never left overlapping an iron, center never inside the iron tube. */
+/** Assert rim integrity for every ball at an observed step: while the ball is
+    laterally lined up with the hoop (the irons are solid), it is never left
+    overlapping an iron and its center is never inside the iron tube. Balls
+    outside the lateral gate pass BESIDE the hoop, so (d,h) overlap is fine. */
 function rimIntegrity(g){
   for (const b of g.balls){
     if (!Number.isFinite(b.d) || !Number.isFinite(b.h) || !Number.isFinite(b.x)) return 'NaN position';
+    if (Math.abs(b.x - g.hoopX) >= C.LAT_GATE) continue;
     for (const id of IRONS){
       const dx = b.d - id, dy = b.h - C.RIM_H;
       const dist = Math.hypot(dx, dy);

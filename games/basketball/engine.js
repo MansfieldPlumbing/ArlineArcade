@@ -209,7 +209,6 @@ function substep(g, b, sdt, ev){
       b.vd *= 0.25; b.vx *= 0.3; b.vh *= 0.55;   // the net grabs it
     } else if (inWindow && engaged && !b.scored){
       // lined up in depth but off-center laterally: clanks the ring edge
-      b.h = C.RIM_H;
       b.vh = Math.abs(b.vh) * 0.4;
       b.vd *= 0.6;
       b.vx += (b.x >= g.hoopX ? 1 : -1) * 0.25;
