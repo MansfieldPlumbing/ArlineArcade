@@ -1,87 +1,67 @@
 /* ============================================================================
-   Arline Arcade — generative chiptune background music
-   Loops a tasteful lounge/jazz chord progression through the SAME Web Audio
-   synth context as sfx.js. No audio files: a soft synthesized piano (walking
-   bass, comped chords, light arpeggio), a few hundred bytes of code, offline.
-   Progression voicings are in the spirit of the MIT-licensed mood library
-   ldrolez/free-midi-chords (https://github.com/ldrolez/free-midi-chords).
-   Music-only mute toggle, persisted. Begins on the first user gesture.
+   Arline Arcade — background music jukebox  (sampled, offline)
+   ----------------------------------------------------------------------------
+   Three looping 32-step grooves — 90s-MIDI Rock, Reggae/Ska, and Bossanova —
+   played through the SHARED sampler + synth drums in sfx.js (self-hosted FluidR3
+   guitar/bass samples, no CDN, no files streamed at runtime). The single music
+   button cycles: Off → Rock → Reggae → Bossa → Off. Choice is persisted, music
+   starts on the first gesture, and it never plays while the tab is hidden.
+
+   Groove patterns (guitar / bass = MIDI notes, 0 = rest; drums 36=kick 38=snare
+   42=hat) are original arrangements characteristic of each genre.
    ============================================================================ */
 import sfx from './sfx.js';
 
-const LS = 'arline-music';
-let enabled = localStorage.getItem(LS) === '1';        // default OFF (looping bg music was too aggressive)
-let ctx = null, master = null, timer = null, playing = false;
-let nextBar = 0, bar = 0, pianoWave = null;
+const LS = 'arline-music', LSG = 'arline-genre';
+let enabled  = localStorage.getItem(LS) === '1';                 // default OFF
+let genreIdx = Math.max(0, Math.min(2, +(localStorage.getItem(LSG) || 0)));
+let ctx = null, master = null, timer = null, playing = false, step = 0, nextTime = 0;
 
-const BPM = 100, BEATS = 4;
-const beat = 60 / BPM;
-const barDur = beat * BEATS;
-const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
-
-/* chord voicings — [bass MIDI, [upper voices]] */
-const V = {
-  Cmaj7:[48,[60,64,67,71]], A7:[45,[61,64,67,69]], Dm7:[50,[62,65,69,72]],
-  G7:[43,[59,62,65,67]],    Em7:[52,[59,62,64,67]], Fmaj7:[53,[60,64,65,69]],
-  Am7:[45,[60,64,67,69]],   D7:[50,[60,62,66,69]],
-};
-/* A 24-bar JRPG-lounge song in three 8-bar sections, looped: bright → lift → wistful */
-const SONG = [
-  'Cmaj7','A7','Dm7','G7','Em7','A7','Dm7','G7',
-  'Fmaj7','Em7','Dm7','G7','Cmaj7','Am7','Dm7','G7',
-  'Am7','Em7','Fmaj7','G7','Am7','D7','Fmaj7','G7',
-].map(n => ({ bass:V[n][0], notes:V[n][1] }));
+const GENRES = [
+  { name:'Rock', bpm:135,
+    guitar:[40,0,40,52,0,43,0,45,40,0,40,55,53,0,52,0,38,0,38,50,0,41,0,43,40,40,52,0,47,45,43,42],
+    bass:  [28,28,28,28,31,31,33,33,28,28,28,28,31,31,30,29,26,26,26,26,29,29,31,31,28,28,28,28,35,34,32,31],
+    drums: [36,42,38,42,36,36,38,42,36,42,38,42,36,42,38,42,36,42,38,42,36,36,38,42,36,42,38,42,38,38,38,0] },
+  { name:'Reggae', bpm:120,
+    guitar:[0,52,0,52,0,55,0,55,0,57,0,57,0,52,0,52,0,53,0,53,0,55,0,55,0,52,0,52,0,52,0,0],
+    bass:  [28,0,31,34,33,0,28,0,35,0,31,0,28,31,33,35,29,0,33,36,31,0,34,0,28,31,33,34,28,0,0,0],
+    drums: [42,0,42,38,42,0,42,38,42,0,42,38,42,0,42,38,42,0,42,38,42,0,42,38,42,0,42,38,42,36,38,0] },
+  { name:'Bossa', bpm:110,
+    guitar:[52,0,52,0,0,55,0,55,0,57,0,57,0,52,0,0,50,0,50,0,0,53,0,53,0,52,0,52,0,0,0,0],
+    bass:  [28,0,0,35,33,0,0,28,29,0,0,36,28,0,35,0,26,0,0,33,31,0,0,26,28,0,0,35,28,0,0,0],
+    drums: [36,42,42,38,36,42,38,42,36,42,42,38,36,42,38,42,36,42,42,38,36,42,38,42,36,42,42,38,36,38,36,38] },
+];
 
 function ensure(){
   ctx = sfx.context(); if(!ctx) return false;
   if(!master){ master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination); }
-  if(!pianoWave) makeWave();
   return true;
 }
-/* A soft synthesized piano: one oscillator carrying a baked-in harmonic
-   spectrum, a struck attack + long exponential ring, and a lowpass that closes
-   as the note decays (the brightness falloff that makes a piano read as piano). */
-function makeWave(){
-  const H = [0, 1.0, 0.5, 0.32, 0.2, 0.13, 0.09, 0.06, 0.04];   // harmonic amplitudes
-  pianoWave = ctx.createPeriodicWave(new Float32Array(H.length), new Float32Array(H));
-}
-function voice(freq, start, dur, gain){
-  const o = ctx.createOscillator(); o.setPeriodicWave(pianoWave); o.frequency.value = freq;
-  const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = 0.7;
-  lp.frequency.setValueAtTime(Math.min(freq*7, 7500), start);
-  lp.frequency.exponentialRampToValueAtTime(Math.max(freq*2.2, 500), start + Math.min(dur, 0.7));
-  const g = ctx.createGain();
-  g.gain.setValueAtTime(0.0001, start);
-  g.gain.linearRampToValueAtTime(gain, start + 0.006);           // quick struck attack
-  g.gain.exponentialRampToValueAtTime(0.0006, start + dur);      // long ring-out
-  o.connect(lp); lp.connect(g); g.connect(master);
-  o.start(start); o.stop(start + dur + 0.05);
-}
-function scheduleBar(i, t){
-  const ch = SONG[i % SONG.length];
-  const hum = ()=> (Math.random()-0.5)*0.008;                    // tiny timing humanize
-  voice(mtof(ch.bass),   t + hum(),          beat*2.4, 0.11);            // left hand: root on 1
-  voice(mtof(ch.bass+7), t + beat*2 + hum(), beat*1.8, 0.085);          //            fifth on 3
-  ch.notes.forEach((m,k)=> voice(mtof(m), t + 0.01 + k*0.012 + hum(), barDur*1.15, 0.06)); // rolled chord
-  for(let b=0;b<BEATS;b++){                                              // light arpeggio over the top
-    const m = ch.notes[(b+1) % ch.notes.length] + 12;
-    voice(mtof(m), t + b*beat + beat*0.5 + hum(), beat*1.1, 0.045);
-  }
-}
-function sched(){
+function schedule(){
   if(!ctx) return;
-  while(nextBar < ctx.currentTime + 0.25){ scheduleBar(bar, nextBar); nextBar += barDur; bar++; }
+  const g = GENRES[genreIdx];
+  const sd = 60 / g.bpm / 2;                                     // eighth-note step
+  while(nextTime < ctx.currentTime + 0.2){
+    const i = step % 32;
+    const gm = g.guitar[i]; if(gm) sfx.sampleNote('guitar', gm, { when:nextTime, dur:sd*1.5, gain:0.16, dest:master });
+    const bm = g.bass[i];   if(bm) sfx.sampleNote('bass',   bm, { when:nextTime, dur:sd*1.9, gain:0.22, dest:master });
+    const dm = g.drums[i];
+    if(dm === 36)      sfx.drum('kick',  { when:nextTime, gain:0.5,  dest:master });
+    else if(dm === 38) sfx.drum('snare', { when:nextTime, gain:0.4,  dest:master });
+    else if(dm === 42) sfx.drum('hat',   { when:nextTime, gain:0.55, dest:master });
+    nextTime += sd; step++;
+  }
 }
 function start(){
   if(playing || !enabled) return;
   if(!ensure()) return;
   sfx.unlock();
-  playing = true; bar = 0; nextBar = ctx.currentTime + 0.18;
+  playing = true; step = 0; nextTime = ctx.currentTime + 0.2;
   master.gain.cancelScheduledValues(ctx.currentTime);
-  master.gain.setValueAtTime(Math.max(0.0001, master.gain.value), ctx.currentTime);
-  master.gain.linearRampToValueAtTime(0.34, ctx.currentTime + 1.6);        // gentle fade-in
-  sched();
-  timer = setInterval(sched, 30);
+  master.gain.setValueAtTime(0.0001, ctx.currentTime);
+  master.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 1.2);   // gentle fade-in
+  schedule();
+  timer = setInterval(schedule, 40);
 }
 function stop(){
   playing = false;
@@ -97,17 +77,23 @@ function updateBtn(btn){
   btn.textContent = enabled ? '♪' : '🔇';
   btn.classList.toggle('off', !enabled);
   btn.setAttribute('aria-pressed', enabled ? 'true' : 'false');
-  btn.title = enabled ? 'Music on' : 'Music off';
+  btn.title = enabled ? `Music: ${GENRES[genreIdx].name} (tap to change)` : 'Music off';
+  btn.setAttribute('aria-label', enabled ? `Music on: ${GENRES[genreIdx].name}. Tap to change track.` : 'Music off. Tap to play.');
 }
-function toggle(btn){
-  enabled = !enabled; localStorage.setItem(LS, enabled ? '1' : '0');
+/* One button, four states: Off → Rock → Reggae → Bossa → Off. */
+function cycle(btn){
+  if(!enabled){ enabled = true; }                       // was off → start current genre
+  else if(genreIdx < GENRES.length - 1){ genreIdx++; stop(); }   // next genre
+  else { enabled = false; genreIdx = 0; }               // past the last → back to off
+  localStorage.setItem(LS, enabled ? '1' : '0');
+  localStorage.setItem(LSG, String(genreIdx));
   updateBtn(btn);
   if(enabled) start(); else stop();
 }
 
 const btn = document.getElementById('musicToggle');
-if(btn){ updateBtn(btn); btn.addEventListener('click', (e)=>{ e.stopPropagation(); toggle(btn); }); }
+if(btn){ updateBtn(btn); btn.addEventListener('click', (e)=>{ e.stopPropagation(); cycle(btn); }); }
 window.addEventListener('pointerdown', ()=>{ if(enabled) start(); }, { once:true });
-document.addEventListener('visibilitychange', ()=>{ if(document.hidden) stop(); else if(enabled) start(); });  // never in the background
+document.addEventListener('visibilitychange', ()=>{ if(document.hidden) stop(); else if(enabled) start(); });
 
-export default { start, stop, toggle:()=>toggle(btn), isOn:()=>enabled };
+export default { start, stop, cycle:()=>cycle(btn), isOn:()=>enabled, genre:()=>GENRES[genreIdx].name };

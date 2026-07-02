@@ -27,6 +27,10 @@ Live site: https://mansfieldplumbing.github.io/ArlineArcade/
 - **Uno** — 2–4 players, friendly computer opponents, card-slide animations.
   Verified by a 5,000-game Node simulation.
 - **Minesweeper** — self-contained applet.
+- **Sound & music** — upgraded from the procedural chiptune "Nintendo peeps" to real sampled
+  instruments: tiny self-hosted FluidR3 guitar/bass/bell samples (CC-BY, offline, no CDN/GPL)
+  layered with synthesized drums, all through a shared "soundcard" rack (warm lowpass + slap-delay).
+  The music button is now a jukebox: Off → Rock → Reggae → Bossa.
 - **Painter** — simplified for Arline: one canvas, ten big swatches, three brush sizes,
   eraser, undo, clear, save. (The 2,300-line pro paint studio is in git history.)
 - **UI polish** — Material/Fluent pass: motion & elevation tokens, gold focus rings,
@@ -99,8 +103,8 @@ Betting is the next slice.
    (the dice + come-out/point flow are live; this is the next slice).
 2. **Double Solitaire** — two independent games stacked to fill the screen, slim top
    bar (trim the "crust"), a single icon-only back button, realistic felt texture.
-3. **Real card sounds** — drop in the shuffle/deal MP3s (replacing the chiptune
-   "Nintendo peeps") under `assets/sounds/`.
+3. **More instrument variety** — the audio engine now plays real samples; adding a few more
+   FluidR3 patches (piano, marimba, brass stabs) would give each game its own voice.
 4. **Intro — fix or cut.** It currently shows a green screen + a tiny button and never
    animates on the tablet. Either make the falling-cards animation actually run, or
    replace it with a quick logo flash. Leaning toward **cut/replace** for reliability.

@@ -64,6 +64,11 @@ The look and structure follow the same recipes as the sibling projects
 dark palette, warm-gold accent, Selawik display type, responsive card grid.
 
 - **Fonts** — Cascadia Code (Nerd Font) and Selawik, both open-source from Microsoft.
+- **Sound & music** — real sampled instrument hits (overdriven guitar, electric bass, tinkle bell)
+  from the **FluidR3_GM** soundfont via [`gleitz/midi-js-soundfonts`](https://github.com/gleitz/midi-js-soundfonts)
+  (**CC-BY 3.0**), a small set of per-note samples vendored under `assets/audio/` so the arcade stays
+  fully offline — layered with original synthesized drums. The three background grooves (Rock / Reggae /
+  Bossa) are original arrangements. No CDN, no streaming, no GPL audio libraries.
 - **Painter** — the `flickpaint` canvas app, simplified into a big-buttons finger-painting page.
 - **Minesweeper** — a self-contained HTML applet.
 - **Playing cards** — number faces, gold frame, and the filigree back are original to
