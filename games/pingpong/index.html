@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ping Pong — Arline Arcade</title>
+<meta name="description" content="Curveball-style 3D table tennis on the felt — put spin on the ball, first to 11. Ad-free.">
+<meta name="theme-color" content="#0b6b40">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../styles/app.css">
+<link rel="stylesheet" href="pingpong.css">
+<!-- Curveball-style mechanics (the classic 2000s web game — a public game
+     concept: depth tunnel, paddle spin, speed ramp). Paddle-spin / speed-up
+     feel cross-checked against jakesgordon/javascript-pong (MIT).
+     All code original. -->
+</head>
+<body>
+<nav class="topbar">
+  <a class="back" href="../../">&#8592; Arcade</a>
+  <span class="crumb">Ping Pong</span>
+</nav>
+
+<main class="table">
+  <section class="scoreboard" aria-label="Score">
+    <div class="side">
+      <span class="who"><span id="serveYou" class="serve-dot" aria-hidden="true"></span> You</span>
+      <span id="scoreYou" class="num">0</span>
+    </div>
+    <div class="mid">
+      <span id="rally" class="rally">0</span>
+      <span class="rally-label">rally</span>
+    </div>
+    <div class="side">
+      <span class="who">Computer <span id="serveCpu" class="serve-dot" aria-hidden="true"></span></span>
+      <span id="scoreCpu" class="num">0</span>
+    </div>
+  </section>
+
+  <p id="status" class="status" aria-live="polite">Your serve &mdash; tap the table to send the ball</p>
+
+  <div class="stage">
+    <canvas id="court" tabindex="0"
+      aria-label="Ping pong tunnel. Move your finger or the mouse to steer the gold paddle; move it as you hit to curve the ball. Tap to serve. Arrow keys also steer, Space serves."></canvas>
+    <div id="overlay" class="overlay" hidden>
+      <h2 id="overlayTitle" class="overlay-title">You win!</h2>
+      <p id="overlayLine" class="overlay-line">11&ndash;8</p>
+      <button id="againBtn" class="pill" type="button">Play again</button>
+    </div>
+  </div>
+
+  <p id="best" class="best"></p>
+</main>
+
+
+<script type="module" src="../../assets/js/music.js"></script>
+<script type="module" src="pingpong.js"></script>
+<script type="module" src="../../assets/js/sw-register.js"></script>
+</body>
+</html>

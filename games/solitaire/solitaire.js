@@ -5,6 +5,7 @@
    CSS-drawn cards for now; the LGPL Svg-cards-2.0.svg deck is an easy art swap.
    ============================================================================ */
 import sfx from '../../assets/js/sfx.js';
+import { snapshot as abSnapshot, restore as abRestore, magicShuffle } from './abilities.js';
 
 const SUITS = [{ch:'♠',color:'black'},{ch:'♥',color:'red'},{ch:'♦',color:'red'},{ch:'♣',color:'black'}];
 const RANKS = ['','A','2','3','4','5','6','7','8','9','10','J','Q','K'];
@@ -14,6 +15,7 @@ const ASPECT = 1.5;                                        // taller cards, bett
 
 const board = document.getElementById('board');
 let cards, stock, waste, foundations, tableau, elMap, slotEl, zc=1, moves=0, won=false;
+let history=[], rewindsLeft=3, shufflesLeft=1, cardsById=new Map();   // Arline's time powers
 const posMap = new Map(); let geo=null, drag=null;
 
 const topOf = a => a[a.length-1];
@@ -29,6 +31,8 @@ function deal(){
   for(let c=0;c<7;c++) for(let k=0;k<=c;k++){ const card=d[i++]; card.up=(k===c); tableau[c].push(card); }
   stock=d.slice(i); stock.forEach(c=>c.up=false);
   waste=[]; foundations=[[],[],[],[]]; moves=0; won=false; zc=1;
+  history=[]; rewindsLeft=3; shufflesLeft=1;
+  cardsById=new Map(cards.map(c=>[c.id,c]));
 
   board.innerHTML=''; slotEl={};
   const names=['t0','t1','t2','t3','t4','t5','t6','stock','waste','f0','f1','f2','f3'];
@@ -103,12 +107,14 @@ function flipSource(loc){
 }
 function bump(run){ for(const c of run) elMap.get(c.id).style.zIndex = 1000 + (zc++); }
 function doFoundation(card, loc){
+  pushHistory();
   removeRun(loc, 1);
   foundations[card.suit].push(card);
   bump([card]); flipSource(loc); moves++; sfx.foundation();
   layout(false); updateBar(); checkWin();
 }
 function doTableau(run, loc, col){
+  pushHistory();
   removeRun(loc, run.length);
   for(const c of run) tableau[col].push(c);
   bump(run); flipSource(loc); moves++; sfx.place();
@@ -116,6 +122,7 @@ function doTableau(run, loc, col){
 }
 function drawStock(){
   if(won) return;
+  pushHistory();
   if(stock.length){ const c=stock.pop(); c.up=true; waste.push(c); bump([c]); sfx.deal(); }
   else if(waste.length){ while(waste.length){ const c=waste.pop(); c.up=false; stock.push(c); } sfx.shuffle(); }
   moves++; layout(false); updateBar();
@@ -130,7 +137,49 @@ function autoStep(){
   for(const [card,loc] of cand){ if(foundationFor(card)>=0){ doFoundation(card,loc); return true; } }
   return false;
 }
-function checkWin(){ if(foundations.every(f=>f.length===13)){ won=true; sfx.win(); showWin(); } }
+function checkWin(){ if(foundations.every(f=>f.length===13)){ won=true; sfx.win(); showWin(); updateBar(); } }
+
+/* ---- Arline's time powers (Braid-style) ----------------------------------- */
+// History entries are plain snapshots (abilities.js); ability counters live
+// OUTSIDE the snapshots on purpose — rewinding a magic shuffle brings the
+// cards back but the shuffle stays spent, so the powers can't be farmed.
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+function pushHistory(){
+  history.push(abSnapshot({stock, waste, foundations, tableau, moves}));
+  if(history.length > 200) history.shift();
+}
+function rewind(){
+  if(won || rewindsLeft <= 0 || !history.length) return;
+  const s = abRestore(history.pop(), cardsById);
+  stock = s.stock; waste = s.waste; foundations = s.foundations; tableau = s.tableau; moves = s.moves;
+  rewindsLeft--;
+  rewindWash(); sfx.shuffle();
+  layout(false); updateBar();          // every card slides back — the Braid feel
+}
+function doMagicShuffle(){
+  if(won || shufflesLeft <= 0) return;
+  const snap = abSnapshot({stock, waste, foundations, tableau, moves});
+  const n = magicShuffle({stock, tableau}, Math.random);
+  if(n < 2){ sfx.invalid(); return; }  // fewer than 2 hidden cards: nothing to shuffle, don't spend it
+  history.push(snap); if(history.length > 200) history.shift();
+  shufflesLeft--;
+  shimmerHidden(); sfx.shuffle();
+  layout(false); updateBar();
+}
+function rewindWash(){
+  if(reducedMotion.matches) return;
+  let w = document.getElementById('rewindWash');
+  if(!w){ w = document.createElement('div'); w.id = 'rewindWash'; w.className = 'rewind-wash'; document.body.appendChild(w); }
+  w.classList.remove('on'); void w.offsetWidth; w.classList.add('on');
+  clearTimeout(w._t); w._t = setTimeout(() => w.classList.remove('on'), 520);
+}
+function shimmerHidden(){
+  if(reducedMotion.matches) return;
+  board.querySelectorAll('.card.down').forEach(e => {
+    e.classList.add('shimmer');
+    setTimeout(() => e.classList.remove('shimmer'), 720);
+  });
+}
 function wiggle(card){ const e=elMap.get(card.id); if(e){ e.classList.add('shake'); setTimeout(()=>e.classList.remove('shake'),320); } sfx.invalid(); }
 
 /* ---- pointer: tap OR drag (both work) ------------------------------------ */
@@ -237,7 +286,21 @@ function confetti(){
     d.style.animation=`drop ${1+Math.random()*1.6}s ${Math.random()*0.6}s ease-in forwards`;
     document.body.appendChild(d); setTimeout(()=>d.remove(),3200); }
 }
-function updateBar(){ const m=document.getElementById('moves'); if(m) m.textContent = moves + (moves===1?' move':' moves'); }
+function updateBar(){
+  const m=document.getElementById('moves'); if(m) m.textContent = moves + (moves===1?' move':' moves');
+  const rb=document.getElementById('rewindBtn');
+  if(rb){
+    const n=document.getElementById('rewindCount'); if(n) n.textContent='x'+rewindsLeft;
+    rb.disabled = won || rewindsLeft<=0 || !history.length;
+    rb.setAttribute('aria-label', `Rewind last move, ${rewindsLeft} left`);
+  }
+  const sb=document.getElementById('shuffleBtn');
+  if(sb){
+    const n=document.getElementById('shuffleCount'); if(n) n.textContent='x'+shufflesLeft;
+    sb.disabled = won || shufflesLeft<=0;
+    sb.setAttribute('aria-label', `Magic shuffle the hidden cards, ${shufflesLeft} left`);
+  }
+}
 
 /* ---- load screen --------------------------------------------------------- */
 // Court figures are <img>; preload them (and the chosen back) so the board never
@@ -260,7 +323,16 @@ function hideLoader(){
 if(board){
   document.getElementById('newGame')?.addEventListener('click', deal);
   document.getElementById('autoBtn')?.addEventListener('click', autoFinish);
+  document.getElementById('rewindBtn')?.addEventListener('click', rewind);
+  document.getElementById('shuffleBtn')?.addEventListener('click', doMagicShuffle);
   document.getElementById('winNew')?.addEventListener('click', ()=>{ hideWin(); deal(); });
+  window.__sol = {
+    get stock(){ return stock.length },
+    get waste(){ return waste.length },
+    get moves(){ return moves },
+    get rewindsLeft(){ return rewindsLeft },
+    get shufflesLeft(){ return shufflesLeft },
+  };
   let rt; addEventListener('resize', ()=>{ clearTimeout(rt); rt=setTimeout(()=>layout(true), 120); });
   deal();
   Promise.race([ preloadDeck(), new Promise(r => setTimeout(r, 3500)) ]).then(hideLoader);

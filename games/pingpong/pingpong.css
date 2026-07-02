@@ -1,0 +1,117 @@
+/* Ping Pong — Arline Arcade. A Curveball-style depth tunnel drawn on 2D canvas:
+   gold wireframe on dark felt, translucent gold paddle, first to 11.
+   No WebGL, no libraries — perspective is plain projection math. */
+
+.table{
+  position:relative; width:100%; max-width:var(--maxw);
+  min-height:calc(100dvh - 62px);
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+  gap:clamp(6px,1.4vh,14px);
+  padding:clamp(10px,2vh,20px) 14px calc(26px + env(safe-area-inset-bottom));
+}
+
+/* ---- scoreboard ----------------------------------------------------------- */
+.scoreboard{
+  display:flex; align-items:flex-start; justify-content:center;
+  gap:clamp(18px,7vw,52px); font-family:var(--mono);
+}
+.side{ display:flex; flex-direction:column; align-items:center; gap:.1rem; min-width:84px }
+.who{
+  display:inline-flex; align-items:center; gap:.4rem;
+  font-size:.7rem; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--paper); opacity:.92; text-shadow:0 1px 3px rgba(0,0,0,.5);
+}
+.num{
+  font-family:var(--display); font-weight:800; line-height:1;
+  font-size:clamp(2.2rem,9vw,3.2rem);
+  background:var(--gold-grad); -webkit-background-clip:text; background-clip:text;
+  color:transparent; text-shadow:0 2px 10px rgba(0,0,0,.3);
+}
+.mid{ display:flex; flex-direction:column; align-items:center; gap:.05rem; padding-top:.35rem; color:var(--muted) }
+.rally{ font-weight:700; font-size:clamp(1.1rem,4.5vw,1.5rem); color:var(--gold-hi); line-height:1 }
+.rally-label{ font-size:.6rem; letter-spacing:.18em; text-transform:uppercase }
+.serve-dot{
+  width:10px; height:10px; border-radius:50%; flex:0 0 auto;
+  background:var(--gold-grad); box-shadow:0 0 8px rgba(233,195,74,.85);
+  opacity:0; transition:opacity var(--dur-quick) var(--ease-standard);
+}
+.serve-dot.on{ opacity:1 }
+
+/* ---- status line ---------------------------------------------------------- */
+.status{
+  font-family:var(--mono); font-size:.88rem; color:var(--paper); text-align:center;
+  margin:0; min-height:1.5em; text-shadow:0 1px 3px rgba(0,0,0,.5); max-width:560px;
+}
+.status.win{ color:#ffe9a8; font-weight:700 }
+.status.lose{ color:#ffb4b4; font-weight:700 }
+
+/* ---- the tunnel ----------------------------------------------------------- */
+.stage{
+  position:relative;
+  width:clamp(240px, min(92vw, calc((100dvh - 305px) * .82)), 520px);
+  aspect-ratio:4 / 5;
+}
+#court{
+  position:absolute; inset:0; width:100%; height:100%; display:block;
+  touch-action:none; cursor:crosshair;
+  border-radius:var(--radius);
+  /* pre-first-frame backdrop matches what the canvas paints */
+  background:radial-gradient(120% 100% at 50% 42%, #0d5c38 0%, #084226 55%, #042817 100%) #052b19;
+  /* gaudy gold frame, same recipe as the home-grid tiles */
+  box-shadow:
+    0 0 0 3px var(--gold-2),
+    0 0 0 4px rgba(0,0,0,.35),
+    inset 0 0 0 2px rgba(255,240,176,.22),
+    0 14px 30px rgba(0,0,0,.4);
+}
+
+/* ---- win overlay ---------------------------------------------------------- */
+.overlay{
+  position:absolute; inset:0; z-index:5;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:.3rem; padding:20px; text-align:center;
+  background:rgba(3,30,18,.74);
+  backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+  border-radius:var(--radius);
+}
+.overlay[hidden]{ display:none }
+@media (prefers-reduced-motion:no-preference){
+  .overlay{ animation:overlayIn var(--dur-med) var(--ease-decelerate) }
+  @keyframes overlayIn{ from{ opacity:0 } to{ opacity:1 } }
+}
+.overlay-title{
+  margin:0; font-family:var(--display); font-weight:800;
+  font-size:clamp(1.8rem,8vw,2.6rem);
+  background:var(--gold-grad); -webkit-background-clip:text; background-clip:text;
+  color:transparent; text-shadow:0 2px 10px rgba(0,0,0,.3);
+}
+.overlay-line{ margin:.1rem 0 1rem; font-family:var(--mono); font-size:.9rem; color:var(--paper) }
+
+/* gold pill button — the craps roll-btn recipe */
+.pill{
+  font:800 1rem/1 var(--mono); color:var(--ink); background:var(--gold-grad);
+  border:none; border-radius:999px; padding:.95rem 2.4rem; min-height:44px; cursor:pointer;
+  box-shadow:0 5px 16px rgba(0,0,0,.45), inset 0 0 0 2px rgba(255,240,176,.4);
+  transition:transform var(--dur-quick) var(--ease-standard), box-shadow var(--dur-quick) var(--ease-standard);
+  letter-spacing:.02em;
+}
+.pill:hover{ transform:translateY(-2px); box-shadow:0 9px 22px rgba(0,0,0,.5), 0 0 22px rgba(233,195,74,.45), inset 0 0 0 2px rgba(255,240,176,.55) }
+.pill:active{ transform:translateY(0) scale(.98) }
+.pill[disabled]{ opacity:.55; cursor:default; transform:none; box-shadow:0 5px 16px rgba(0,0,0,.45) }
+
+/* ---- footer line ----------------------------------------------------------- */
+.best{
+  margin:0; font-family:var(--mono); font-size:.7rem; letter-spacing:.08em;
+  color:var(--muted); text-align:center;
+}
+
+/* short-and-wide screens (phone landscape): trim the chrome so the court fits */
+@media (max-height:520px) and (orientation:landscape){
+  .table{ gap:4px; padding-top:6px }
+  .num{ font-size:1.6rem }
+  .stage{ width:clamp(200px, calc((100dvh - 190px) * .82), 520px) }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .serve-dot,.pill{ transition:none }
+}

@@ -1,0 +1,128 @@
+/* FreeCell — Arline Arcade. Same recipe as Klondike: cards are absolutely
+   positioned; moving = changing a transform, so the CSS transition slides
+   them (that is also what makes the Rewind read as time flowing backwards). */
+
+/* ---- load screen (covers the board until the deck art is ready) ---- */
+.sol-load{
+  position:fixed; inset:0; z-index:1200; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:18px;
+  background:radial-gradient(circle at 50% 38%, #0c6b41, #053620 78%);
+  transition:opacity .45s ease; opacity:1;
+}
+.sol-load.gone{ opacity:0; pointer-events:none }
+.sol-load-logo{ width:min(58vw,260px); height:auto; filter:drop-shadow(0 6px 18px rgba(0,0,0,.5)) }
+.sol-load-spinner{
+  width:46px; height:46px; border-radius:50%;
+  border:4px solid rgba(233,195,74,.25); border-top-color:#e9c34a;
+  animation:solSpin .8s linear infinite;
+}
+.sol-load-text{ font-family:var(--mono,monospace); font-size:.86rem; letter-spacing:.06em; color:#ecd9a0; opacity:.9 }
+@keyframes solSpin{ to{ transform:rotate(360deg) } }
+@media (prefers-reduced-motion:reduce){ .sol-load-spinner{ animation:none } }
+
+/* ---- toolbar ---- */
+.sol-bar{
+  display:flex; align-items:center; justify-content:center; gap:.6rem; flex-wrap:wrap;
+  width:100%; max-width:900px; margin:0 auto; padding:6px clamp(8px,3vw,18px) 2px;
+}
+.btn{
+  font:700 .82rem/1 var(--mono); color:var(--ink); background:var(--gold-grad);
+  border:none; border-radius:999px; padding:.6rem 1.2rem; cursor:pointer; min-height:44px;
+  box-shadow:0 3px 10px rgba(0,0,0,.4); transition:transform .12s ease, box-shadow .12s ease;
+}
+.btn:hover{ transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,.45), 0 0 18px rgba(233,195,74,.4) }
+.btn.ghost{ background:rgba(0,0,0,.25); color:var(--gold-hi); box-shadow:inset 0 0 0 1px var(--line) }
+.btn:disabled{
+  opacity:.42; cursor:default; pointer-events:none;
+  transform:none; box-shadow:inset 0 0 0 1px rgba(233,195,74,.18);
+}
+.btn:focus-visible{ outline:2px solid var(--gold); outline-offset:2px }
+.moves{ font-family:var(--mono); font-size:.78rem; color:var(--paper); opacity:.85; margin-left:.3rem }
+
+/* Rewind pill + its little gold count chip */
+.btn.rewind{ display:inline-flex; align-items:center; gap:.45em; padding-right:.8rem }
+.btn.rewind .chip{
+  display:inline-block; padding:.16em .55em; border-radius:999px;
+  background:var(--gold-grad); color:var(--ink); font-size:.72em; font-weight:800;
+  box-shadow:0 1px 3px rgba(0,0,0,.4);
+}
+.btn.rewind:disabled .chip{ filter:grayscale(.8) brightness(.8) }
+
+/* ---- board ---- */
+.board{ position:relative; width:100%; max-width:900px; margin:0 auto; min-height:62vh }
+.slot{
+  position:absolute; left:0; top:0; width:var(--cw,44px); height:var(--ch, calc(var(--cw,44px) * 1.5));
+  border-radius:calc(var(--cw,44px) * .1); border:2px dashed rgba(233,195,74,.26);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.18);
+}
+.slot.cell::after{
+  content:"✦"; position:absolute; inset:0; display:grid; place-items:center;
+  font-size:calc(var(--cw,44px)*.42); color:rgba(233,195,74,.3);
+}
+.slot.foundation{ border-style:solid; border-color:rgba(233,195,74,.2) }
+.slot.foundation::after{
+  content:attr(data-suit); position:absolute; inset:0; display:grid; place-items:center;
+  font-size:calc(var(--cw,44px)*.55); color:rgba(233,195,74,.22);
+  font-family:"Segoe UI Symbol","Noto Sans Symbols2","Noto Sans Symbols","DejaVu Sans",sans-serif;
+}
+
+/* ---- cards (always face-up in FreeCell) ---- */
+.card{
+  position:absolute; left:0; top:0; width:var(--cw,44px); height:var(--ch, calc(var(--cw,44px) * 1.5));
+  border-radius:calc(var(--cw,44px) * .1); overflow:hidden; cursor:pointer; touch-action:none;
+  background:#fff; color:#1d1f26;
+  border:1px solid rgba(0,0,0,.14);
+  box-shadow:0 1px 2px rgba(0,0,0,.35), 0 5px 12px rgba(0,0,0,.26);
+  transition:transform .26s cubic-bezier(.2,.7,.3,1), box-shadow .2s ease;
+  will-change:transform; user-select:none; -webkit-user-select:none; font-family:var(--display);
+}
+.board.no-anim .card{ transition:none }
+.card .cf{
+  position:absolute; inset:0; width:100%; height:100%; display:block;
+  border-radius:inherit; pointer-events:none; object-fit:cover;
+}
+.card.dragging{ transition:none !important; cursor:grabbing; box-shadow:0 12px 28px rgba(0,0,0,.55) }
+.card.red{ color:var(--red) }
+.card.shake{ animation:fcBad .32s }
+@keyframes fcBad{
+  0%,100%{ box-shadow:0 1px 2px rgba(0,0,0,.35), 0 5px 12px rgba(0,0,0,.26) }
+  45%{ box-shadow:0 0 0 3px var(--red), 0 6px 14px rgba(0,0,0,.4) }
+}
+
+/* ---- Rewind wash: a ~500ms sepia + vignette "time flows backwards" beat ---- */
+.rewind-wash{
+  position:fixed; inset:0; z-index:900; pointer-events:none; opacity:0;
+  transition:opacity .22s ease;
+  background:radial-gradient(120% 90% at 50% 42%, rgba(133,86,29,.22) 34%, rgba(29,15,3,.62) 100%);
+}
+.rewind-wash.on{
+  opacity:1;
+  -webkit-backdrop-filter:sepia(.65) contrast(.96);
+  backdrop-filter:sepia(.65) contrast(.96);
+}
+@media (prefers-reduced-motion:reduce){ .rewind-wash{ display:none } }
+
+/* ---- win ---- */
+.win{
+  position:fixed; inset:0; z-index:1100; display:none; place-items:center;
+  background:radial-gradient(circle at 50% 38%, rgba(6,42,26,.5), rgba(3,12,7,.86));
+  -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px);
+}
+.win.show{ display:grid; animation:winFade .4s ease }
+.win .panel{
+  text-align:center; padding:clamp(22px,5vw,38px) clamp(28px,6vw,52px);
+  background:linear-gradient(180deg,rgba(12,70,42,.96),rgba(6,42,26,.98)); border-radius:20px;
+  box-shadow:0 0 0 3px var(--gold-2), inset 0 0 0 2px rgba(255,240,176,.25), 0 22px 54px rgba(0,0,0,.6);
+}
+.win .panel .big{ font-size:clamp(3rem,16vw,5.5rem) }
+.win .panel h1{ font-family:var(--display); font-weight:700; font-size:clamp(2rem,8vw,3rem); margin:.2rem 0; background:var(--gold-grad); -webkit-background-clip:text; background-clip:text; color:transparent }
+.win .panel p{ color:var(--paper); margin:.2rem 0 1.3rem }
+@keyframes winFade{ from{opacity:0} to{opacity:1} }
+.confetti{ position:fixed; top:-20px; width:10px; height:14px; border-radius:2px; z-index:1099; pointer-events:none }
+@keyframes drop{ to{ transform:translateY(112vh) rotate(720deg); opacity:.25 } }
+
+@media (prefers-reduced-motion:reduce){
+  .card{ transition:none }
+  .card.shake{ animation:none }
+  .win.show{ animation:none }
+}

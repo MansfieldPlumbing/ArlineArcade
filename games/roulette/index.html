@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Roulette — Arline Arcade</title>
+<meta name="description" content="Spin the golden wheel — European roulette on the green felt. Play chips, no stakes, ad-free.">
+<meta name="theme-color" content="#0b6b40">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../styles/app.css">
+<link rel="stylesheet" href="roulette.css">
+</head>
+<body>
+<nav class="topbar">
+  <a class="back" href="../../">&#8592; Arcade</a>
+  <span class="crumb">Roulette</span>
+</nav>
+
+<main id="table" class="felt">
+  <div class="wheel-wrap" id="wheelWrap">
+    <canvas id="wheel" role="img" aria-label="Roulette wheel"></canvas>
+  </div>
+
+  <p id="status" class="status" role="status" aria-live="polite" aria-atomic="true">Pick a chip, tap the felt to bet, then spin.</p>
+
+  <div id="history" class="history" aria-label="Last numbers"></div>
+
+  <div class="bank-row">
+    <div class="bank-box">
+      <span class="lbl">Bank</span>
+      <span id="bank" class="val">500</span>
+    </div>
+    <button id="spinBtn" class="spin-btn" type="button">SPIN</button>
+    <div class="bank-box">
+      <span class="lbl">Bet</span>
+      <span id="staked" class="val">0</span>
+    </div>
+  </div>
+
+  <div class="chip-rack" role="group" aria-label="Chip value">
+    <button class="chip-btn d1"   type="button" data-denom="1"   aria-pressed="false"><span>1</span></button>
+    <button class="chip-btn d5"   type="button" data-denom="5"   aria-pressed="true"><span>5</span></button>
+    <button class="chip-btn d25"  type="button" data-denom="25"  aria-pressed="false"><span>25</span></button>
+    <button class="chip-btn d100" type="button" data-denom="100" aria-pressed="false"><span>100</span></button>
+    <button id="clearBtn" class="clear-btn" type="button">Clear bets</button>
+  </div>
+
+  <div id="board" class="board" aria-label="Betting layout"></div>
+  <div id="outside" class="outside" aria-label="Even-money bets"></div>
+
+  <p class="fineprint">Play chips only &mdash; it&rsquo;s an arcade, not a casino. Single-zero wheel, straight pays 35:1.</p>
+</main>
+
+<div id="toast" class="toast" hidden></div>
+
+
+<script type="module" src="../../assets/js/music.js"></script>
+<script type="module" src="roulette.js"></script>
+<script type="module" src="../../assets/js/sw-register.js"></script>
+</body>
+</html>

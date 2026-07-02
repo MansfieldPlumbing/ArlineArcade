@@ -1,0 +1,201 @@
+/* Roulette — Arline Arcade.  A gold-rimmed wheel (2D canvas) over a classic
+   betting felt. Green felt + Luxor gold, portrait-first, no libraries. */
+
+:focus-visible{ outline:2px solid var(--gold); outline-offset:2px }
+
+.felt{
+  position:relative; width:100%; min-height:calc(100dvh - 52px);
+  display:flex; flex-direction:column; align-items:center;
+  gap:clamp(10px,2vh,18px); padding:clamp(12px,2.5vh,24px) 14px 40px;
+  /* layered felt: soft spotlight + woven weave + edge vignette (house recipe) */
+  background:
+    radial-gradient(120% 90% at 50% 22%, rgba(255,255,255,.06), rgba(0,0,0,0) 46%),
+    repeating-linear-gradient(45deg, rgba(0,0,0,.05) 0 2px, rgba(255,255,255,.018) 2px 4px),
+    repeating-linear-gradient(-45deg, rgba(0,0,0,.05) 0 2px, rgba(255,255,255,.018) 2px 4px),
+    radial-gradient(140% 120% at 50% 30%, #0e7a48 0%, #0b6437 55%, #073d22 100%);
+  background-color:#0b6437;
+  box-shadow:inset 0 0 120px rgba(0,0,0,.55), inset 0 0 0 6px rgba(201,162,57,.16);
+}
+.felt button{ touch-action:manipulation }
+
+/* ---- the wheel ------------------------------------------------------------ */
+.wheel-wrap{
+  width:min(88vw, 350px); aspect-ratio:1; flex:0 0 auto; position:relative;
+  filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));
+  transition:opacity .18s ease;
+}
+.wheel-wrap.dim{ opacity:.25 }
+.wheel-wrap canvas{ display:block; width:100%; height:100%; touch-action:manipulation }
+
+/* status + history ----------------------------------------------------------- */
+.status{
+  margin:0; min-height:1.4em; max-width:460px; text-align:center;
+  font-family:var(--mono); font-size:.92rem; color:var(--paper);
+  text-shadow:0 1px 3px rgba(0,0,0,.5);
+}
+.status.win{ color:#ffe9a8; font-weight:700 }
+.status.lose{ color:#ffb4b4 }
+
+.history{
+  display:flex; gap:5px; min-height:28px; align-items:center; justify-content:center;
+  flex-wrap:wrap; max-width:420px;
+}
+.history .dot{
+  width:26px; height:26px; border-radius:50%; display:grid; place-items:center;
+  font:700 .62rem/1 var(--mono); color:var(--cream);
+  box-shadow:inset 0 0 0 1.5px rgba(233,195,74,.55), 0 2px 4px rgba(0,0,0,.4);
+}
+.history .dot.red{   background:radial-gradient(circle at 36% 30%, #e4576280, transparent 60%), #b81a29 }
+.history .dot.black{ background:radial-gradient(circle at 36% 30%, #4a505880, transparent 60%), #15181d }
+.history .dot.green{ background:radial-gradient(circle at 36% 30%, #35a86c80, transparent 60%), #0b6b40 }
+.history .dot:first-child{ box-shadow:inset 0 0 0 2px var(--gold), 0 0 12px rgba(233,195,74,.55) }
+
+/* bank / bet / spin ---------------------------------------------------------- */
+.bank-row{
+  display:flex; align-items:center; justify-content:center; gap:clamp(10px,3vw,22px);
+  width:100%; max-width:420px;
+}
+.bank-box{
+  display:flex; flex-direction:column; align-items:center; gap:.1rem; min-width:86px;
+  padding:.45rem .8rem; border:1px solid var(--line); border-radius:12px;
+  background:rgba(0,0,0,.25); position:relative;
+}
+.bank-box .lbl{ font:600 .62rem/1 var(--mono); letter-spacing:.14em; text-transform:uppercase; color:var(--muted) }
+.bank-box .val{
+  font-family:var(--display); font-weight:800; font-size:1.35rem; line-height:1.1;
+  background:var(--gold-grad); -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.bank-box.shake{ animation:bankShake .3s ease }
+@keyframes bankShake{ 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+
+.pop{
+  position:absolute; left:50%; top:-6px; transform:translateX(-50%);
+  font:800 1rem/1 var(--mono); color:var(--gold-hi); pointer-events:none;
+  text-shadow:0 1px 4px rgba(0,0,0,.6); animation:popUp .95s cubic-bezier(.2,0,0,1) forwards;
+}
+@keyframes popUp{ from{ opacity:0; transform:translate(-50%,6px) } 25%{opacity:1} to{ opacity:0; transform:translate(-50%,-30px) } }
+
+/* gold pill (house .roll-btn recipe) */
+.spin-btn{
+  font:800 1.05rem/1 var(--mono); color:var(--ink); background:var(--gold-grad);
+  border:none; border-radius:999px; padding:1rem 2.2rem; cursor:pointer; min-height:48px;
+  box-shadow:0 5px 16px rgba(0,0,0,.45), inset 0 0 0 2px rgba(255,240,176,.4);
+  transition:transform .15s cubic-bezier(.2,0,0,1), box-shadow .15s cubic-bezier(.2,0,0,1);
+  letter-spacing:.08em;
+}
+.spin-btn:hover{ transform:translateY(-2px); box-shadow:0 9px 22px rgba(0,0,0,.5), 0 0 22px rgba(233,195,74,.45), inset 0 0 0 2px rgba(255,240,176,.55) }
+.spin-btn:active{ transform:translateY(0) scale(.98) }
+.spin-btn[disabled]{ opacity:.55; cursor:default; transform:none; box-shadow:0 5px 16px rgba(0,0,0,.45) }
+
+/* chip rack ------------------------------------------------------------------ */
+.chip-rack{ display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap; max-width:420px }
+.chip-btn{
+  width:54px; height:54px; border-radius:50%; cursor:pointer; position:relative;
+  border:none; display:grid; place-items:center;
+  font:800 .95rem/1 var(--mono);
+  box-shadow:0 4px 8px rgba(0,0,0,.45), inset 0 0 0 2px rgba(0,0,0,.22);
+  transition:transform .15s cubic-bezier(.2,0,0,1), box-shadow .15s cubic-bezier(.2,0,0,1);
+}
+.chip-btn::before{ /* dashed chip ring */
+  content:""; position:absolute; inset:5px; border-radius:50%;
+  border:2px dashed rgba(255,255,255,.65); pointer-events:none;
+}
+.chip-btn.d1{   background:radial-gradient(circle at 36% 30%, #fffefb, #ddd2b8); color:var(--ink) }
+.chip-btn.d5{   background:radial-gradient(circle at 36% 30%, #e45762, #a01423); color:var(--cream) }
+.chip-btn.d25{  background:radial-gradient(circle at 36% 30%, #23a066, #0a5c34); color:var(--cream) }
+.chip-btn.d100{ background:radial-gradient(circle at 36% 30%, #3b4048, #101317); color:var(--gold-hi) }
+.chip-btn[aria-pressed="true"]{
+  transform:translateY(-4px);
+  box-shadow:0 0 0 3px var(--gold), 0 8px 16px rgba(0,0,0,.5), 0 0 18px rgba(233,195,74,.55);
+}
+.chip-btn[disabled]{ opacity:.5; cursor:default }
+
+.clear-btn{
+  font:600 .78rem/1 var(--mono); letter-spacing:.04em; color:var(--gold-hi);
+  background:rgba(0,0,0,.22); border:1px solid var(--line); border-radius:999px;
+  padding:.7rem 1rem; min-height:44px; cursor:pointer;
+  transition:border-color .15s, box-shadow .15s;
+}
+.clear-btn:hover{ border-color:var(--gold); box-shadow:0 0 16px rgba(233,195,74,.35) }
+.clear-btn[disabled]{ opacity:.5; cursor:default; border-color:var(--line); box-shadow:none }
+
+/* betting felt ---------------------------------------------------------------- */
+.board{
+  display:grid; width:100%; max-width:420px; gap:3px;
+  grid-template-columns:minmax(46px,.62fr) repeat(3,1fr);
+  grid-auto-rows:minmax(44px,auto);
+}
+.outside{
+  display:grid; width:100%; max-width:420px; gap:3px; margin-top:-1px;
+  grid-template-columns:repeat(3,1fr); grid-auto-rows:minmax(46px,auto);
+}
+.cell{
+  position:relative; min-height:44px; border-radius:7px; cursor:pointer; padding:0;
+  font:700 1.02rem/1 var(--mono); color:var(--cream);
+  background:rgba(0,0,0,.22); border:1.5px solid var(--line);
+  text-shadow:0 1px 2px rgba(0,0,0,.55);
+  transition:box-shadow .15s cubic-bezier(.2,0,0,1), background-color .15s;
+}
+.cell:hover{ border-color:var(--gold) }
+.cell[disabled]{ cursor:default; opacity:.85 }
+.cell.red{   background:linear-gradient(180deg, #cf2939, #941120) }
+.cell.blk{   background:linear-gradient(180deg, #23272e, #101317) }
+.cell.zero{  background:linear-gradient(180deg, #12905396, #0a532e96); color:var(--gold-hi); font-size:1.25rem }
+.cell.doz, .cell.colbet, .outside .cell{
+  font-size:.82rem; letter-spacing:.06em; color:var(--gold-hi);
+}
+.cell.doz span{ writing-mode:vertical-rl; transform:rotate(180deg); pointer-events:none; letter-spacing:.12em }
+.outside .cell.red-lbl::after, .outside .cell.blk-lbl::after{
+  content:""; display:inline-block; width:.8em; height:.8em; border-radius:3px;
+  margin-left:.45em; vertical-align:-.08em; box-shadow:inset 0 0 0 1px rgba(255,240,176,.5);
+}
+.outside .cell.red-lbl::after{ background:#cf2939 }
+.outside .cell.blk-lbl::after{ background:#15181d }
+
+.cell.won{
+  border-color:var(--gold);
+  box-shadow:0 0 0 2px var(--gold), 0 0 20px rgba(233,195,74,.7), inset 0 0 14px rgba(233,195,74,.35);
+}
+
+/* a stack of placed chips on a cell */
+.stack{
+  position:absolute; left:50%; top:50%; width:46px; height:46px; margin:-23px 0 0 -23px;
+  display:grid; place-items:center; border-radius:50%;
+}
+.stack .disc{
+  width:34px; height:34px; border-radius:50%; display:grid; place-items:center;
+  font:800 .68rem/1 var(--mono);
+  box-shadow:
+    inset 0 0 0 2px rgba(0,0,0,.25),
+    0 2px 0 rgba(0,0,0,.35), 0 4px 0 rgba(0,0,0,.3), 0 7px 8px rgba(0,0,0,.5);
+}
+.stack .disc::before{
+  content:""; position:absolute; inset:4px; border-radius:50%;
+  border:1.5px dashed rgba(255,255,255,.6); pointer-events:none;
+}
+.stack .disc.d1{   background:radial-gradient(circle at 36% 30%, #fffefb, #ddd2b8); color:var(--ink) }
+.stack .disc.d5{   background:radial-gradient(circle at 36% 30%, #e45762, #a01423); color:var(--cream) }
+.stack .disc.d25{  background:radial-gradient(circle at 36% 30%, #23a066, #0a5c34); color:var(--cream) }
+.stack .disc.d100{ background:radial-gradient(circle at 36% 30%, #3b4048, #101317); color:var(--gold-hi) }
+
+.fineprint{
+  margin:6px 0 0; font-family:var(--mono); font-size:.68rem; color:var(--muted);
+  text-align:center; max-width:420px; opacity:.85;
+}
+
+/* toast ------------------------------------------------------------------------ */
+.toast{
+  position:fixed; left:50%; bottom:84px; transform:translateX(-50%) translateY(8px);
+  z-index:950; max-width:min(88vw,420px); text-align:center;
+  font:700 .88rem/1.35 var(--mono); color:var(--ink); background:var(--gold-grad);
+  border-radius:14px; padding:.8rem 1.2rem; opacity:0; pointer-events:none;
+  box-shadow:0 8px 24px rgba(0,0,0,.5), inset 0 0 0 2px rgba(255,240,176,.5);
+  transition:opacity .25s cubic-bezier(.2,0,0,1), transform .25s cubic-bezier(.2,0,0,1);
+}
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0) }
+
+@media (prefers-reduced-motion:reduce){
+  .pop{ animation:none; opacity:1 }
+  .bank-box.shake{ animation:none }
+  .wheel-wrap{ transition:none }
+}

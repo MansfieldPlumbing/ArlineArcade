@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bowling — Arline Arcade</title>
+<meta name="description" content="Ten-pin bowling on warm wood — drag the ball to aim, flick up to bowl. Ad-free.">
+<meta name="theme-color" content="#0b6b40">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../styles/app.css">
+<link rel="stylesheet" href="bowling.css">
+<!-- Flick-to-bowl feel inspired by iliagrigorevdev/bowling (GPL-3.0) —
+     gameplay reference only, all code original. -->
+</head>
+<body>
+<nav class="topbar">
+  <a class="back" href="../../">&#8592; Arcade</a>
+  <span class="crumb">Bowling</span>
+</nav>
+
+<main class="alley">
+  <section id="scoreStrip" class="score-strip" aria-label="Scorecard"></section>
+
+  <p id="status" class="status" aria-live="polite">Frame 1 &middot; Roll 1 &mdash; drag the ball, flick up to bowl</p>
+
+  <div class="lane-wrap">
+    <canvas id="lane" tabindex="0"
+      aria-label="Bowling lane. Drag the ball sideways to aim, then flick upward to bowl. Arrow keys aim, space bowls."></canvas>
+
+    <div id="finalPanel" class="final-panel" hidden>
+      <div class="final-card">
+        <p class="final-title">Game over</p>
+        <p id="finalScore" class="final-score">0</p>
+        <p id="finalNote" class="final-note"></p>
+        <button id="againBtn" class="gold-pill" type="button">Play again</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="newGame" class="gold-pill small" type="button">New game</button>
+    <span id="best" class="best">Best: &mdash;</span>
+  </div>
+</main>
+
+
+<script type="module" src="../../assets/js/music.js"></script>
+<script type="module" src="bowling.js"></script>
+<script type="module" src="../../assets/js/sw-register.js"></script>
+</body>
+</html>

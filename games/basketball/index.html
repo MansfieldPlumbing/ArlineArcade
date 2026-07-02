@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>Basketball — Arline Arcade</title>
+<meta name="description" content="Arcade hoops on the felt — flick the ball, beat the buzzer, catch fire. Ad-free.">
+<meta name="theme-color" content="#0b6b40">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../styles/app.css">
+<link rel="stylesheet" href="basketball.css">
+</head>
+<body>
+<nav class="topbar">
+  <a class="back" href="../../">&#8592; Arcade</a>
+  <span class="crumb">Basketball</span>
+</nav>
+
+<main id="courtWrap" class="court-wrap">
+  <canvas id="court" tabindex="0"
+          aria-label="Basketball court. Flick up from the ball to shoot. Space bar also shoots."></canvas>
+
+  <div class="hud">
+    <div class="stat"><span class="lbl">Score</span><span id="score" class="val">0</span></div>
+    <div id="timer" class="timer" aria-label="Seconds left">60</div>
+    <div class="stat"><span class="lbl">Best</span><span id="best" class="val">0</span></div>
+  </div>
+  <p id="status" class="status" role="status" aria-live="polite">Flick the ball up to shoot &mdash; 60 seconds on the clock</p>
+
+  <div id="endPanel" class="end-panel" role="dialog" aria-modal="true" aria-labelledby="endTitle" hidden>
+    <div class="end-card">
+      <h2 id="endTitle">Buzzer!</h2>
+      <p class="final"><span id="finalScore">0</span><span class="pts-word">points</span></p>
+      <p id="bestLine" class="best-line">Best: 0</p>
+      <button id="again" class="pill" type="button">Play again</button>
+    </div>
+  </div>
+</main>
+
+
+<script type="module" src="../../assets/js/music.js"></script>
+<script type="module" src="basketball.js"></script>
+<script type="module" src="../../assets/js/sw-register.js"></script>
+</body>
+</html>

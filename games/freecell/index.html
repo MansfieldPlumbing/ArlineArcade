@@ -4,35 +4,36 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light">
-<title>Solitaire — Arline Arcade</title>
-<meta name="description" content="Klondike Solitaire — tap to play, smooth and ad-free.">
+<title>FreeCell &mdash; Arline Arcade</title>
+<meta name="description" content="FreeCell — every card face-up, four free cells, and a triple Rewind. Smooth and ad-free.">
 <meta name="theme-color" content="#0b6b40">
 <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../../styles/app.css">
-<link rel="stylesheet" href="solitaire.css">
+<link rel="stylesheet" href="freecell.css">
 <link rel="stylesheet" href="../../assets/css/deck-prefs.css">
 </head>
 <body>
-<div id="solLoad" class="sol-load" role="status" aria-label="Loading">
+<div id="fcLoad" class="sol-load" role="status" aria-label="Loading">
   <img class="sol-load-logo" src="../../assets/arlinearcade-logo.png" alt="Arline Arcade" decoding="async">
   <div class="sol-load-spinner" aria-hidden="true"></div>
   <p class="sol-load-text">Shuffling the deck&hellip;</p>
 </div>
 <nav class="topbar">
   <a class="back" href="../../">&#8592; Arcade</a>
-  <span class="crumb">Solitaire</span>
+  <span class="crumb">FreeCell</span>
 </nav>
 
 <div class="sol-bar">
   <button id="newGame" class="btn">New game</button>
   <button id="autoBtn" class="btn ghost">Auto-finish</button>
-  <button id="rewindBtn" class="btn ghost pill" type="button" aria-label="Rewind last move, 3 left" disabled>&#10226; Rewind <span class="chip" id="rewindCount">x3</span></button>
-  <button id="shuffleBtn" class="btn ghost pill" type="button" aria-label="Magic shuffle the hidden cards, 1 left">&#10022; Shuffle <span class="chip" id="shuffleCount">x1</span></button>
-  <span class="moves" id="moves">0 moves</span>
+  <button id="rewindBtn" class="btn ghost rewind" type="button" aria-label="Rewind last move, 3 left" disabled>&#10226; Rewind <span id="rewindChip" class="chip">x3</span></button>
+  <span class="moves" id="moves" aria-live="polite">0 moves</span>
   <button class="btn ghost settings-gear" data-settings type="button" aria-label="Settings">&#9881;</button>
 </div>
 
 <div id="board" class="board"></div>
+
+<div id="rewindWash" class="rewind-wash" aria-hidden="true"></div>
 
 <div id="win" class="win">
   <div class="panel">
@@ -44,10 +45,10 @@
 </div>
 
 
-<script>setTimeout(function(){var l=document.getElementById('solLoad');if(l)l.classList.add('gone');},7000);</script>
+<script>setTimeout(function(){var l=document.getElementById('fcLoad');if(l)l.classList.add('gone');},7000);</script>
 <script src="../../assets/js/deck-prefs.js"></script>
 <script type="module" src="../../assets/js/music.js"></script>
-<script type="module" src="solitaire.js"></script>
+<script type="module" src="freecell.js"></script>
 <script type="module" src="../../assets/js/sw-register.js"></script>
 </body>
 </html>
