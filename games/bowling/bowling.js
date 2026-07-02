@@ -210,14 +210,15 @@ function drawLane(){
     ctx.ellipse(sx(k * 5.32, d), sy(d), 1.2 * view.ppi * s, 0.7 * view.ppi * s, 0, 0, Math.PI * 2);
     ctx.fill();
   }
+  ctx.fillStyle = 'rgba(94,21,32,.6)';
   for (let k = -3; k <= 3; k++){
     const yIn = 192 - Math.abs(k) * 12;
     const d = depthOf(yIn), s = view.ppi * scaleAt(d);
     const ax = sx(k * 5.32, d), ay = sy(d);
     ctx.beginPath();
-    ctx.moveTo(ax, ay - 4.6 * s);
-    ctx.lineTo(ax - 1.7 * s, ay);
-    ctx.lineTo(ax + 1.7 * s, ay);
+    ctx.moveTo(ax, ay - 3.4 * s);
+    ctx.lineTo(ax - 1.25 * s, ay);
+    ctx.lineTo(ax + 1.25 * s, ay);
     ctx.closePath();
     ctx.fill();
   }

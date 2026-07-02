@@ -232,3 +232,4 @@ body.intro-lock{ overflow:hidden }
   transition:border-color var(--dur-quick) var(--ease-standard), box-shadow var(--dur-quick) var(--ease-standard);
 }
 .replay-link:hover{ border-color:var(--gold); box-shadow:0 0 16px rgba(233,195,74,.35) }
+.replay-link.off{ opacity:.55; filter:grayscale(.6) }

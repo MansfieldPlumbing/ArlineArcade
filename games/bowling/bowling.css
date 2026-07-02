@@ -66,7 +66,8 @@
 #lane:focus-visible{ outline:2px solid var(--gold); outline-offset:2px }
 
 /* ---- controls row ---------------------------------------------------------- */
-.controls{ display:flex; align-items:center; justify-content:space-between; gap:12px }
+/* right padding keeps the Best pill clear of the fixed music toggle */
+.controls{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding-right:60px }
 .best{
   font-family:var(--mono); font-size:.82rem; color:var(--gold-hi);
   padding:.45rem .9rem; border:1px solid var(--line); border-radius:999px;
@@ -91,6 +92,7 @@
 .gold-pill.small{ font-size:.85rem; padding:.7rem 1.4rem }
 
 /* ---- final panel ----------------------------------------------------------- */
+.final-panel[hidden]{ display:none }
 .final-panel{
   position:absolute; inset:0; display:grid; place-items:center;
   background:rgba(3,26,15,.72);
