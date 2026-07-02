@@ -8,10 +8,31 @@ Live site: https://mansfieldplumbing.github.io/ArlineArcade/
 ## ✅ Done & live
 
 - **Solitaire (Klondike)** — tap-to-move *and* drag-and-drop, auto-finish, win screen.
-  Logic verified by a 4,000-game Node simulation.
+  Logic verified by a 4,000-game Node simulation. Now with **Braid-style time powers**:
+  ⟲ Rewind ×3 per game (cards visibly slide back in time) and ✦ Magic Shuffle ×1
+  (reshuffles the *hidden* cards — with draw-1 unlimited recycles, shuffling only the
+  stock would change nothing). Powers proven by `games/solitaire/sim.mjs`.
+- **FreeCell** — all face-up, four free cells, supermove math, ⟲ Rewind ×3.
+  Proven by a 2,000-game / 300k-move invariant sim.
+- **Roulette** — European single-zero wheel on canvas, ball lands deterministically on
+  the solved pocket (the craps-dice trick), chip betting + bankroll, friendly comp on
+  bust. Payouts proven by a 20-million-spin Monte Carlo (house edge 2.70% ± 0.35%).
+- **Bowling** — drag-to-aim, flick-to-bowl with hook, pseudo-3D lane, classic scorecard.
+  Scoring proven against the canon (perfect 300, all-spares 150, kata game 133).
+  Flick feel inspired by `iliagrigorevdev/bowling` (GPL-3.0) — gameplay reference only.
+- **Basketball** — 60-second pop-a-shot, two-iron rim physics, streaks + ON FIRE,
+  drifting hoop. Sim proves no rim tunneling and one-count makes.
+- **Ping Pong** — Curveball-style golden tunnel rally vs. the machine, spin/curve from
+  paddle movement. Sim-proven physics and deuce scoring.
 - **Uno** — 2–4 players, friendly computer opponents, card-slide animations.
   Verified by a 5,000-game Node simulation.
-- **Minesweeper**, **Painter** — self-contained applets.
+- **Minesweeper** — self-contained applet.
+- **Painter** — simplified for Arline: one canvas, ten big swatches, three brush sizes,
+  eraser, undo, clear, save. (The 2,300-line pro paint studio is in git history.)
+- **UI polish** — Material/Fluent pass: motion & elevation tokens, gold focus rings,
+  ≥44px touch targets, acrylic sticky app bar, pressed states, staggered tile entrance.
+  Chrome de-cluttered: no floating music button (one quiet pill in the home footer),
+  no replay-intro button, no logo repeated on game pages.
 - **The deck** — bold legible number cards, classic public-domain court figures,
   gaudy gold frames, and an original crimson-and-gold filigree back.
 - **Always-fresh** — a service worker auto-updates the site and clears old cache, so
@@ -74,19 +95,22 @@ Betting is the next slice.
 
 ## 🛠️ Backlog (queued, roughly in priority order)
 
-1. **Double Solitaire** — two independent games stacked to fill the screen, slim top
+1. **Craps betting** — Pass Line, Pass Odds, Field, Place 6 & 8 with chips + bankroll
+   (the dice + come-out/point flow are live; this is the next slice).
+2. **Double Solitaire** — two independent games stacked to fill the screen, slim top
    bar (trim the "crust"), a single icon-only back button, realistic felt texture.
-2. **Real card sounds** — drop in the shuffle/deal MP3s (replacing the chiptune
+3. **Real card sounds** — drop in the shuffle/deal MP3s (replacing the chiptune
    "Nintendo peeps") under `assets/sounds/`.
-3. **Intro — fix or cut.** It currently shows a green screen + a tiny button and never
+4. **Intro — fix or cut.** It currently shows a green screen + a tiny button and never
    animates on the tablet. Either make the falling-cards animation actually run, or
    replace it with a quick logo flash. Leaning toward **cut/replace** for reliability.
-4. **Roulette** — original build; spinning wheel + ball on the felt, gaudy gold.
-   (Reference: GPL-licensed projects exist, but we'll write our own to stay license-clean.)
+   (The "Replay intro" footer button is already gone.)
 5. **Slots** — "Super Slots" to match the logo. Way more gaudy/Luxor than any reference;
    chunky gold reels, big lever, celebratory wins.
 6. **Gaudy reskin pass** — push the whole arcade further toward the Luxor / high-roller
    look across every game.
+7. **NES applet** — the owner has a single-file `nes.html`; drop it into `games/nes/`
+   and add a tile when it's in the repo.
 
 ---
 
