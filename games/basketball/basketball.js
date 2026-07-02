@@ -162,10 +162,10 @@ function burst(x, y){
 function trail(b){
   if (PRM) return;
   const x = sx(b.x, b.d), y = sy(b.d, b.h), r = rPx(b.d);
-  for (let i = 0; i < 2; i++){
-    particles.push({ x: x + (Math.random() - 0.5) * r, y: y + (Math.random() - 0.5) * r,
-                     vx: (Math.random() - 0.5) * 30, vy: 20 + Math.random() * 40,
-                     ttl: 0.4, life: 0.4, r: r * (0.25 + Math.random() * 0.3), kind: 'fire' });
+  for (let i = 0; i < 3; i++){
+    particles.push({ x: x + (Math.random() - 0.5) * r * 1.2, y: y + (Math.random() - 0.5) * r * 1.2,
+                     vx: (Math.random() - 0.5) * 30, vy: 26 + Math.random() * 46,
+                     ttl: 0.55, life: 0.55, r: r * (0.3 + Math.random() * 0.35), kind: 'fire' });
   }
 }
 function stepParticles(dt){
@@ -247,15 +247,27 @@ function drawShadow(b){
 function drawStand(){
   const s = sD(C.BOARD_D);
   const bx = sx(game.hoopX, C.BOARD_D);
-  const topY = sy(C.BOARD_D, C.BOARD_BOT);
-  const botY = yF(C.BOARD_D + 0.02);
-  const w = Math.max(4, 0.016 * W * s);
-  const g = ctx.createLinearGradient(bx - w, 0, bx + w, 0);
-  g.addColorStop(0, '#3c2c10'); g.addColorStop(0.5, '#7a5c22'); g.addColorStop(1, '#2c1f0a');
+  const topY = sy(C.BOARD_D, C.BOARD_BOT) - 2;
+  const botY = yF(C.BOARD_D + 0.06);
+  const wTop = Math.max(5, 0.026 * W * s);
+  const wBot = Math.max(10, 0.05 * W * s);
+  // base shadow pad
+  ctx.fillStyle = 'rgba(0,0,0,.2)';
+  ctx.beginPath(); ctx.ellipse(bx, botY, wBot * 1.15, wBot * 0.34, 0, 0, Math.PI * 2); ctx.fill();
+  // tapered stanchion column
+  const g = ctx.createLinearGradient(bx - wBot, 0, bx + wBot, 0);
+  g.addColorStop(0, '#241a06'); g.addColorStop(0.45, '#6b512a'); g.addColorStop(1, '#191106');
   ctx.fillStyle = g;
-  ctx.fillRect(bx - w / 2, topY, w, botY - topY);
-  ctx.fillStyle = 'rgba(0,0,0,.3)';
-  ctx.beginPath(); ctx.ellipse(bx, botY, w * 2.4, w * 0.8, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(bx - wTop / 2, topY);
+  ctx.lineTo(bx + wTop / 2, topY);
+  ctx.lineTo(bx + wBot / 2, botY);
+  ctx.lineTo(bx - wBot / 2, botY);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(233,195,74,.3)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
 }
 
 function drawBoard(){
