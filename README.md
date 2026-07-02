@@ -74,3 +74,4 @@ dark palette, warm-gold accent, Selawik display type, responsive card grid.
 - **Bowling** — flick-to-bowl feel inspired by [`iliagrigorevdev/bowling`](https://github.com/iliagrigorevdev/bowling) (GPL-3.0), **gameplay reference only** — all code original.
 - **Basketball** — gravity-arc technique reference [`lamesjim/Canvas-Basketball-Game`](https://github.com/lamesjim/Canvas-Basketball-Game) (MIT); all code original.
 - **Roulette** — wheel order, colors, and the 2.70% house edge verified against public references; all code original.
+- **Ping Pong** — the classic *Curveball* concept as mechanics reference; spin/speed feel cross-checked against [`jakesgordon/javascript-pong`](https://github.com/jakesgordon/javascript-pong) (MIT). All code original.
