@@ -370,7 +370,7 @@ function loop(now){
       resolve(result);
     }
   }
-  if (sweep && performance.now() >= sweep.start + sweep.dur){
+  if (sweep && now >= sweep.start + sweep.dur){
     const done = sweep.done; sweep = null;
     done && done();
   }
@@ -402,7 +402,7 @@ function throwBall(launch){
     sfxCount: 0,
     events: result.events.map(e => ({ ...e, at: (e.t / simDur) * wall, fired: false })),
   };
-  say(state === 'rolling' ? 'Rolling…' : '');
+  say('Rolling…');
   startLoop();
 }
 
