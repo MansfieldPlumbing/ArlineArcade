@@ -41,6 +41,15 @@
 
   --maxw:1000px; --radius:18px;
   --gold-grad:linear-gradient(180deg, var(--gold-hi), var(--gold) 45%, var(--gold-2));
+
+  /* motion + elevation tokens (Material 3 / Fluent-style, tuned to the felt) */
+  --ease-standard:cubic-bezier(.2,0,0,1);      /* everyday transitions        */
+  --ease-decelerate:cubic-bezier(.05,.7,.1,1); /* things arriving on screen   */
+  --ease-accelerate:cubic-bezier(.3,0,.8,.15); /* things leaving              */
+  --dur-quick:150ms; --dur-med:250ms; --dur-slow:400ms;
+  --elev-1:0 2px 6px rgba(0,0,0,.35);
+  --elev-2:0 6px 18px rgba(0,0,0,.42);
+  --elev-3:0 14px 34px rgba(0,0,0,.5);
 }
 
 /* cross-page fade + a persistent, morphing logo (View Transitions; older
@@ -65,6 +74,10 @@ body::after{
     repeating-linear-gradient(-45deg, rgba(0,0,0,.05) 0 1px, transparent 1px 3px);
 }
 a{color:inherit}
+
+/* one visible, consistent keyboard-focus ring everywhere (Fluent-style) */
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--gold); outline-offset:2px; border-radius:6px}
 
 /* ---- layout --------------------------------------------------------------- */
 .wrap{width:100%; max-width:var(--maxw); padding:clamp(18px,4vw,44px) clamp(16px,4vw,30px); margin:0 auto}
@@ -100,9 +113,14 @@ a{color:inherit}
     inset 0 0 0 2px rgba(255,240,176,.25),
     inset 0 18px 40px rgba(0,0,0,.35),
     0 14px 30px rgba(0,0,0,.4);
-  transition:transform .16s ease, box-shadow .16s ease;
+  transition:transform var(--dur-quick) var(--ease-standard), box-shadow var(--dur-quick) var(--ease-standard);
   overflow:hidden;
 }
+/* staggered entrance on load (each tile sets --i inline) */
+@media (prefers-reduced-motion:no-preference){
+  .tile{ animation:tileIn var(--dur-slow) var(--ease-decelerate) backwards; animation-delay:calc(var(--i,0)*45ms) }
+}
+@keyframes tileIn{ from{ opacity:0; transform:translateY(14px) } to{ opacity:1; transform:none } }
 .tile::before{ /* sheen */
   content:""; position:absolute; inset:0; pointer-events:none;
   background:radial-gradient(120% 60% at 50% -20%, rgba(255,255,255,.12), transparent 60%);
@@ -128,6 +146,8 @@ a{color:inherit}
 .tile .go{margin-top:auto; font-family:var(--mono); font-size:.82rem; color:var(--gold-hi); display:inline-flex; align-items:center; gap:.4rem}
 .tile .go::after{content:"→"; transition:transform .2s ease}
 .tile:hover .go::after{transform:translateX(4px)}
+/* pressed state: quick sink, feels tactile on touch (Fluent press) */
+.tile:active{ transform:translateY(-1px) scale(.985); transition-duration:60ms }
 .tile .badge{
   position:absolute; right:14px; bottom:14px; font-family:var(--mono); font-size:.62rem; letter-spacing:.12em;
   text-transform:uppercase; color:var(--ink); background:var(--gold-grad); padding:.22rem .55rem; border-radius:999px;
@@ -140,9 +160,18 @@ a{color:inherit}
 .site-footer a{color:var(--gold); text-decoration:none; border-bottom:1px solid var(--line)}
 
 /* ---- game-page chrome (stubs / wrappers) ---------------------------------- */
-.topbar{width:100%; max-width:var(--maxw); display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:clamp(14px,3vw,22px) clamp(16px,4vw,30px); margin:0 auto}
-.back{font-family:var(--mono); font-size:.85rem; color:var(--gold-hi); text-decoration:none; display:inline-flex; align-items:center; gap:.45rem; padding:.5rem .8rem; border:1px solid var(--line); border-radius:999px; background:rgba(0,0,0,.22); transition:border-color .16s, box-shadow .16s}
+/* acrylic app bar: sticky, translucent, blurred (Fluent), hairline gold rule */
+.topbar{
+  position:sticky; top:0; z-index:120;
+  width:100%; max-width:var(--maxw); display:flex; align-items:center; justify-content:space-between;
+  gap:1rem; padding:clamp(10px,2.2vw,16px) clamp(16px,4vw,30px); margin:0 auto;
+  background:linear-gradient(180deg, rgba(3,36,22,.88), rgba(3,36,22,.62));
+  backdrop-filter:blur(14px) saturate(1.15); -webkit-backdrop-filter:blur(14px) saturate(1.15);
+  border-bottom:1px solid rgba(233,195,74,.22); box-shadow:var(--elev-1);
+}
+.back{font-family:var(--mono); font-size:.85rem; color:var(--gold-hi); text-decoration:none; display:inline-flex; align-items:center; gap:.45rem; min-height:44px; padding:.5rem 1rem; border:1px solid var(--line); border-radius:999px; background:rgba(0,0,0,.22); transition:border-color var(--dur-quick) var(--ease-standard), box-shadow var(--dur-quick) var(--ease-standard), transform var(--dur-quick) var(--ease-standard)}
 .back:hover{border-color:var(--gold); box-shadow:0 0 18px rgba(233,195,74,.35)}
+.back:active{transform:scale(.97)}
 .crumb{font-family:var(--mono); font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; color:var(--gold)}
 .topbar-logo{ height:34px; width:auto; view-transition-name:arcade-logo; filter:drop-shadow(0 2px 6px rgba(0,0,0,.5)) }
 
@@ -199,6 +228,7 @@ body.intro-lock{ overflow:hidden }
 .replay-link{
   margin-top:.7rem; font-family:var(--mono); font-size:.78rem; letter-spacing:.04em;
   color:var(--gold-hi); background:rgba(0,0,0,.22); border:1px solid var(--line);
-  border-radius:999px; padding:.4rem .9rem; cursor:pointer; transition:border-color .15s, box-shadow .15s;
+  border-radius:999px; padding:.6rem 1rem; min-height:44px; cursor:pointer;
+  transition:border-color var(--dur-quick) var(--ease-standard), box-shadow var(--dur-quick) var(--ease-standard);
 }
 .replay-link:hover{ border-color:var(--gold); box-shadow:0 0 16px rgba(233,195,74,.35) }
