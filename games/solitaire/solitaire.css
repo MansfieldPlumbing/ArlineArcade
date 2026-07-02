@@ -111,3 +111,35 @@ html[data-back="burgundy"] .card.down{ background-image:url(../../assets/cards/r
 .credit a{ color:var(--gold); text-decoration:none }
 
 @media (prefers-reduced-motion:reduce){ .card{ transition:none } }
+
+/* ---- Arline's time powers: rewind + magic shuffle pills & effects ---- */
+.sol-bar .pill{ min-height:44px; display:inline-flex; align-items:center; gap:.45rem }
+.sol-bar .pill .chip{
+  font-family:var(--mono); font-size:.66rem; font-weight:800; line-height:1;
+  color:var(--ink); background:var(--gold-grad); border-radius:999px; padding:.22rem .44rem;
+  box-shadow:0 1px 3px rgba(0,0,0,.35);
+}
+.sol-bar .pill:disabled{ opacity:.4; cursor:default; pointer-events:none; transform:none }
+.sol-bar .pill:focus-visible{ outline:2px solid var(--gold); outline-offset:2px }
+
+/* magic shuffle: brief gold shimmer washing over every face-down card */
+.card.down.shimmer{ animation:solShimmer .7s cubic-bezier(0,0,.2,1) }
+@keyframes solShimmer{
+  0%,100%{ box-shadow:0 1px 2px rgba(0,0,0,.4), 0 5px 12px rgba(0,0,0,.3); filter:none }
+  45%{ box-shadow:0 0 0 2px var(--gold-hi), 0 0 20px 5px rgba(233,195,74,.8); filter:brightness(1.25) saturate(1.15) }
+}
+
+/* rewind: ~500ms sepia + vignette wash over the whole board */
+.rewind-wash{
+  position:fixed; inset:0; z-index:1050; pointer-events:none; opacity:0;
+  background:
+    radial-gradient(ellipse at 50% 44%, rgba(0,0,0,0) 40%, rgba(24,12,2,.7) 100%),
+    linear-gradient(rgba(173,124,48,.3), rgba(173,124,48,.3));
+}
+.rewind-wash.on{ animation:solRewind .5s cubic-bezier(0,0,.2,1) }
+@keyframes solRewind{ 0%{ opacity:0 } 30%{ opacity:1 } 100%{ opacity:0 } }
+
+@media (prefers-reduced-motion:reduce){
+  .card.down.shimmer{ animation:none }
+  .rewind-wash.on{ animation:none; opacity:0 }
+}
