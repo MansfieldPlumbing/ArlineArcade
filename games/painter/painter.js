@@ -49,7 +49,9 @@ function fitCanvas() {
 }
 
 let resizeTimer = 0;
-window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(fitCanvas, 120); });
+const scheduleFit = () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(fitCanvas, 120); };
+window.addEventListener('resize', scheduleFit);
+new ResizeObserver(scheduleFit).observe(canvas);   // catches any reflow, not just rotation
 
 /* ---- undo: a small stack of snapshots -------------------------------------- */
 const undoStack = [];
